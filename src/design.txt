@@ -1,0 +1,8 @@
+Window Class
+- Manages I/O operations of the program, displaying relevant key info and taking in key presses to pass to the manager
+
+KeyManager Class
+- Manages the collection of keys being tracked and the times they were pressed, calculating kps and bpm
+
+Key Class
+- Represents a key with a character and the times it was pressed
