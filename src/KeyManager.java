@@ -5,6 +5,10 @@ public class KeyManager {
     private int totalPresses;
     private int kps;
     private int bpm;
+    // UR calculator, maybe a class that takes in the bpm to calculate unstable rate
+    
+    //according to most osu tools, the bpm is kpm/4, so kps * 15, kinda weird how its not kps*60???? or just bpm=kpm idk im not a musician
+    // 
 
     public KeyManager() {
         keysTracking = new HashMap<>();
