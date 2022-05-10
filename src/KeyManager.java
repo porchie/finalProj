@@ -31,7 +31,7 @@ public class KeyManager {
         return true; // true, a key has been pressed, so reset the timer for session reset
     }
 
-    public String getKeyInfo(char c)
+    public String getKeyInfo(char c) // testing method for seeing key info maybe useful for display
     {
         c = Character.toUpperCase(c);
         Key k = keysTracking.get(c);

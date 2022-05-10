@@ -1,6 +1,7 @@
 public class Key {
     private char keyChar;
     private int timesPressed;
+    private boolean pressed;
 
     public Key(char keyChar) {
         this.keyChar = keyChar;
@@ -18,6 +19,8 @@ public class Key {
     {
         timesPressed++;
     }
+
+    public boolean isPressed() {return pressed;}
 
 
 }

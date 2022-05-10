@@ -1,20 +1,23 @@
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
-public class Window extends JFrame {
+
+public class ProgramWindow extends JFrame {
     // button for adding a key
     // button for calculating UR(unstable rate)
     // graph to display UR
     // 
-    
+
+
     private JFrame j;
     private JLabel label; //test
+    private Map<JLabel,Key> KeyToLabelDisplay;
     private JPanel p; //test
     private JLabel label2; //test
     private JPanel p2; //test
     private KeyManager manager;
-    public Window(){
+    public ProgramWindow(){
         j = new JFrame();
         manager = new KeyManager();
         manager.addKey('S');
@@ -40,23 +43,27 @@ public class Window extends JFrame {
 
         j.setVisible(true);
     }
-    public class KeyTracker extends KeyAdapter { // better key detection + no hold blocking
+    public class KeyTracker extends KeyAdapter { // need even not active window detect keys
         @Override
         public void keyPressed(KeyEvent e) {
+
+                int key = e.getKeyCode();
+
+                if (key == KeyEvent.VK_S) {
+                    manager.pressKey('S');
+                    label.setText(manager.getKeyInfo('S'));
+                    System.out.println(manager.getKeyInfo('S'));
+                }
+                if (key == KeyEvent.VK_D) {
+                    manager.pressKey('D');
+                    label2.setText(manager.getKeyInfo('D'));
+                    System.out.println(manager.getKeyInfo('D'));
+                }
+
+        }
+        public void keyReleased(KeyEvent e) {
             int key = e.getKeyCode();
-
-            if (key == KeyEvent.VK_S) {
-                manager.pressKey('S');
-                label.setText(manager.getKeyInfo('S'));
-                System.out.println(manager.getKeyInfo('S'));
-            }
-            if (key == KeyEvent.VK_D) {
-                manager.pressKey('D');
-                label2.setText(manager.getKeyInfo('D'));
-                System.out.println(manager.getKeyInfo('D'));
-            }
-
-
+            System.out.println("key released");
         }
     }
 }
