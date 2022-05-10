@@ -7,10 +7,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../jnativehook/out/artifacts/jnativehook_jar/jnativehook.jar!/" />
+          <root url="jar://$USER_HOME$/Downloads/jar_files/jnativehook-2.1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
