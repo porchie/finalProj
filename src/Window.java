@@ -3,7 +3,11 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class Window extends JFrame {
-
+    // button for adding a key
+    // button for calculating UR(unstable rate)
+    // graph to display UR
+    // 
+    
     private JFrame j;
     private JLabel label; //test
     private JPanel p; //test
@@ -36,7 +40,7 @@ public class Window extends JFrame {
 
         j.setVisible(true);
     }
-    public class KeyTracker extends KeyAdapter {
+    public class KeyTracker extends KeyAdapter { // better key detection + no hold blocking
         @Override
         public void keyPressed(KeyEvent e) {
             int key = e.getKeyCode();
