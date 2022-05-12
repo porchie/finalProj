@@ -85,6 +85,7 @@ public class ProgramWindow extends JFrame {
         Key k = manager.addKey(c);
         if(!keyLabelMap.containsKey(c)) {
             KeyLabel kl = new KeyLabel(new ImageIcon(buttonUp), k);
+            kl.setForeground(Color.WHITE);
             keyLabelMap.put(c, kl);
             p.add(kl);
         }
