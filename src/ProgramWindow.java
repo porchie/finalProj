@@ -23,16 +23,14 @@ public class ProgramWindow extends JFrame {
 
 
     private JFrame j;
-    private JLabel label; //test
     private JPanel p; //test
-    private JLabel label2; //test
-
     private KeyManager manager;
-
     private Map<Character, KeyLabel> keyLabelMap;
 
     private BufferedImage buttonUp;
     private BufferedImage buttonDown;
+
+
     public ProgramWindow(){
         Key.buildKeyMap();
 
@@ -53,8 +51,8 @@ public class ProgramWindow extends JFrame {
 
         addKey('S');
         addKey('D');
-        addKey('J');
         addKey('K');
+        addKey('L');
 
         j.setSize(500, 330);
         j.setLocation(5, 5);
@@ -84,18 +82,6 @@ public class ProgramWindow extends JFrame {
 
             p.add(kl);
         }
-
-       /* label = new JLabel(new ImageIcon(buttonUp));
-        label2 = new JLabel(new ImageIcon(buttonUp));
-        label.setHorizontalTextPosition(JLabel.CENTER);
-        label.setVerticalTextPosition(JLabel.CENTER);
-        label2.setHorizontalTextPosition(JLabel.CENTER);
-        label2.setVerticalTextPosition(JLabel.CENTER);
-
-        p.add(label);
-        p.add(label2);*/
-
-
         j.setVisible(true);
     }
 
@@ -105,7 +91,7 @@ public class ProgramWindow extends JFrame {
         Key k = manager.addKey(c);
         if(!keyLabelMap.containsKey(c)) keyLabelMap.put(c, new KeyLabel(new ImageIcon(buttonUp),k));
     }
-    public class KeyTracker implements NativeKeyListener { // need even not active window detect keys
+    public class KeyTracker implements NativeKeyListener {
 
 
         @Override
