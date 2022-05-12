@@ -14,12 +14,13 @@ public class KeyManager {
         keysTracking = new HashMap<>();
     }
 
-    public boolean addKey(char c) // need to somehow detect this somehow???
+    public Key addKey(char c) // need to somehow detect this somehow???
     {
         c = Character.toUpperCase(c);
-        if (keysTracking.containsKey(c)) return false;
-        keysTracking.put(c, new Key(c));
-        return true;
+        if (keysTracking.containsKey(c)) return null;
+        Key k = new Key(c);
+        keysTracking.put(c, k);
+        return k;
     }
 
     public boolean pressKey(char c)

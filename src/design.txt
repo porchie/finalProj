@@ -1,4 +1,4 @@
-Window Class
+ProgramWindow Class
 - Manages I/O operations of the program, displaying relevant key info and taking in key presses to pass to the manager
 
 KeyManager Class
@@ -6,3 +6,9 @@ KeyManager Class
 
 Key Class
 - Represents a key with a character and the times it was pressed
+
+
+
+
+ProgramWindow handles I/O, and key presses and uses key presses to run something
+ProgramWindow has a KeyManager, KeyGraph and probably a map of all keyPress codes to a KeyLabel for display. A KeyLabel is a subclass of JLabel that makes settings the buttons easier;
