@@ -37,6 +37,7 @@ public class KeyManager {
         c = Character.toUpperCase(c);
         Key k = keysTracking.get(c);
         if(k == null) return "";
+        if( c == ' ') return "space " + k.getTimesPressed();
         return c + " " + k.getTimesPressed();
     }
     

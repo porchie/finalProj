@@ -9,6 +9,6 @@ public class KeyLabel extends JLabel {
         this.key = key;
         setHorizontalTextPosition(JLabel.CENTER);
         setVerticalTextPosition(JLabel.CENTER);
-        setText(key.getKeyChar() + " " + key.getTimesPressed());
+        setText(  ((key.getKeyChar() == ' ')  ? "space":key.getKeyChar()) + " " + key.getTimesPressed());
     }
 }

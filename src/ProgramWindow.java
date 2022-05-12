@@ -43,6 +43,7 @@ public class ProgramWindow extends JFrame {
 
         keyLabelMap = new HashMap<>();
 
+        p = new JPanel();
         j = new JFrame();
         manager = new KeyManager();
 
@@ -51,6 +52,7 @@ public class ProgramWindow extends JFrame {
 
         addKey('S');
         addKey('D');
+        addKey('F');
         addKey('K');
         addKey('L');
 
@@ -71,17 +73,9 @@ public class ProgramWindow extends JFrame {
         GlobalScreen.addNativeKeyListener(new KeyTracker());
 
 
-        p = new JPanel();
         j.add(p);
         p.setLocation(20,120);
         p.setSize(50,50);
-        for(Map.Entry<Character,KeyLabel> entry: keyLabelMap.entrySet())
-        {
-            char c = entry.getKey();
-            KeyLabel kl = entry.getValue();
-
-            p.add(kl);
-        }
         j.setVisible(true);
     }
 
@@ -89,7 +83,11 @@ public class ProgramWindow extends JFrame {
     {
         c = Character.toUpperCase(c);
         Key k = manager.addKey(c);
-        if(!keyLabelMap.containsKey(c)) keyLabelMap.put(c, new KeyLabel(new ImageIcon(buttonUp),k));
+        if(!keyLabelMap.containsKey(c)) {
+            KeyLabel kl = new KeyLabel(new ImageIcon(buttonUp), k);
+            keyLabelMap.put(c, kl);
+            p.add(kl);
+        }
     }
     public class KeyTracker implements NativeKeyListener {
 
