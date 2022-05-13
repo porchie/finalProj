@@ -23,12 +23,25 @@ public class KeyManager {
         return k;
     }
 
+    public int getTotalPresses() {
+        return totalPresses;
+    }
+
+    public int getKps() {
+        return kps;
+    }
+
+    public int getBpm() {
+        return bpm;
+    }
+
     public boolean pressKey(char c)
     {
         c = Character.toUpperCase(c);
         Key k = keysTracking.get(c);
         if(k == null) return false; // no key of this character is tracked, so false, no key has been pressed, and the timer for session reset continues
         k.pressKey();
+        totalPresses++;
         return true; // true, a key has been pressed, so reset the timer for session reset
     }
 

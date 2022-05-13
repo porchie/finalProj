@@ -23,17 +23,22 @@ public class ProgramWindow extends JFrame {
 
 
     private JFrame j;
-    private JPanel p; //test
+    private JPanel p;
+
+    private JLabel infoLabel;
     private KeyManager manager;
     private Map<Character, KeyLabel> keyLabelMap;
 
     private BufferedImage buttonUp;
     private BufferedImage buttonDown;
 
+    private KeyGraph kg;
+    private ArrayList<Character> keyOrder;
+
 
     public ProgramWindow(){
         Key.buildKeyMap();
-
+        keyOrder = new ArrayList<>();
         try {
            buttonUp = ImageIO.read(new File("assets/button_up.png"));
            buttonDown = ImageIO.read(new File("assets/button_down.png"));
@@ -44,10 +49,12 @@ public class ProgramWindow extends JFrame {
         keyLabelMap = new HashMap<>();
 
         p = new JPanel();
+
+        //infoLabel = new JLabel("KPS:\nBPM:\nTOTAL KEYS:",SwingConstants.CENTER);
+        //p.setLayout(new BorderLayout());
+        //p.add(infoLabel, BorderLayout.PAGE_END);
         j = new JFrame();
         manager = new KeyManager();
-
-
 
 
         addKey('S');
@@ -56,7 +63,7 @@ public class ProgramWindow extends JFrame {
         addKey('K');
         addKey('L');
 
-        j.setSize(500, 330);
+        j.setSize(1000, 330);
         j.setLocation(5, 5);
 
 
@@ -76,7 +83,14 @@ public class ProgramWindow extends JFrame {
         j.add(p);
         p.setLocation(20,120);
         p.setSize(50,50);
+
+        //j.add(infoPanel);
         j.setVisible(true);
+    }
+
+    private void updateLabel()
+    {
+        infoLabel.setText("KPS:" + manager.getKps() + "\n" + "BPM:" + manager.getBpm() + "\n" + "TOTAL KEYS:" + manager.getTotalPresses());
     }
 
     private void addKey(char c)
@@ -88,6 +102,7 @@ public class ProgramWindow extends JFrame {
             kl.setForeground(Color.WHITE);
             keyLabelMap.put(c, kl);
             p.add(kl);
+            keyOrder.add(c);
         }
     }
     public class KeyTracker implements NativeKeyListener {
@@ -95,6 +110,7 @@ public class ProgramWindow extends JFrame {
 
         @Override
         public void nativeKeyPressed(NativeKeyEvent e) {
+
 
                 int key = e.getKeyCode();
                 Character c = Key.keyMap.get(key);
@@ -120,6 +136,7 @@ public class ProgramWindow extends JFrame {
                 manager.pressKey(c);
                 kl.setText(manager.getKeyInfo(c));
                 kl.setIcon(new ImageIcon(buttonUp));
+                updateLabel();
             }
 
         }
