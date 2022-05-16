@@ -25,18 +25,25 @@ public class ProgramWindow extends JFrame {
     private JFrame j;
     private JPanel p;
 
+
+    private boolean closed;
     private JLabel infoLabel;
+    private JPanel infoPanel;
     private KeyManager manager;
     private Map<Character, KeyLabel> keyLabelMap;
 
+    private long startTime;
     private BufferedImage buttonUp;
     private BufferedImage buttonDown;
+
+    private long lastPressTime;
 
     private KeyGraph kg;
     private ArrayList<Character> keyOrder;
 
 
     public ProgramWindow(){
+        startTime = new Date().getTime();
         Key.buildKeyMap();
         keyOrder = new ArrayList<>();
         try {
@@ -49,13 +56,12 @@ public class ProgramWindow extends JFrame {
         keyLabelMap = new HashMap<>();
 
         p = new JPanel();
+        infoPanel = new JPanel();
 
-        //infoLabel = new JLabel("KPS:\nBPM:\nTOTAL KEYS:",SwingConstants.CENTER);
-        //p.setLayout(new BorderLayout());
-        //p.add(infoLabel, BorderLayout.PAGE_END);
-        j = new JFrame();
+      //  infoPanel.setLayout(new BorderLayout());
+        j = new JFrame("javaKPS");
+        j.setLayout(new BorderLayout());
         manager = new KeyManager();
-
 
         addKey('S');
         addKey('D');
@@ -63,8 +69,17 @@ public class ProgramWindow extends JFrame {
         addKey('K');
         addKey('L');
 
+        infoPanel.setPreferredSize(new Dimension(100,100));
+        infoLabel = new JLabel("<html>KPS:<br>BPM:<br>TOTAL KEYS:</html>",SwingConstants.CENTER);
+        infoPanel.add(infoLabel, BorderLayout.PAGE_END);
+
+        infoLabel.setHorizontalTextPosition(JLabel.CENTER);
+        infoLabel.setVerticalTextPosition(JLabel.CENTER);
+
+
         j.setSize(1000, 330);
-        j.setLocation(5, 5);
+        j.setLocationRelativeTo(null);
+        j.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 
 
@@ -81,16 +96,36 @@ public class ProgramWindow extends JFrame {
 
 
         j.add(p);
+        j.add(infoPanel, BorderLayout.SOUTH);
         p.setLocation(20,120);
-        p.setSize(50,50);
+       // p.setSize(50,50);
 
-        //j.add(infoPanel);
+        j.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                closed = true;
+                System.out.println("closing");
+            }
+        });
+
+
         j.setVisible(true);
+
+
+        while(!closed)
+        {
+            long curTime = new Date().getTime();
+            manager.updateTime(curTime - startTime);
+            updateLabel();
+        }
+        System.out.println("closcd");
+
+        System.exit(0);
     }
 
     private void updateLabel()
     {
-        infoLabel.setText("KPS:" + manager.getKps() + "\n" + "BPM:" + manager.getBpm() + "\n" + "TOTAL KEYS:" + manager.getTotalPresses());
+        infoLabel.setText("<html>KPS:" + (int)manager.getKps() + "<br>" + "BPM:" + manager.getBpm() + "<br>" + "TOTAL KEYS:" + manager.getTotalPresses()+ "</html>");
     }
 
     private void addKey(char c)
@@ -119,6 +154,7 @@ public class ProgramWindow extends JFrame {
                 if(kl != null)
                 {
                     kl.setIcon(new ImageIcon(buttonDown));
+                    lastPressTime = new Date().getTime();
                 }
 
         }
@@ -136,9 +172,8 @@ public class ProgramWindow extends JFrame {
                 manager.pressKey(c);
                 kl.setText(manager.getKeyInfo(c));
                 kl.setIcon(new ImageIcon(buttonUp));
-                updateLabel();
+                //updateLabel();
             }
-
         }
 
         @Override

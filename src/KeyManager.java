@@ -3,8 +3,7 @@ import java.util.*;
 public class KeyManager {
     private Map<Character, Key> keysTracking;
     private int totalPresses;
-    private int kps;
-    private int bpm;
+    private double time;
     // UR calculator, maybe a class that takes in the bpm to calculate unstable rate
     
     //according to most osu tools, the bpm is kpm/4, so kps * 15, kinda weird how its not kps*60???? or just bpm=kpm idk im not a musician
@@ -27,14 +26,18 @@ public class KeyManager {
         return totalPresses;
     }
 
-    public int getKps() {
-        return kps;
+    public double getKps() {
+        return (totalPresses / time);
     }
 
     public int getBpm() {
-        return bpm;
+        return (int)(getKps() * 15);
     }
 
+    public void updateTime(long time)
+    {
+        this.time = (double)time / 1000;
+    }
     public boolean pressKey(char c)
     {
         c = Character.toUpperCase(c);
