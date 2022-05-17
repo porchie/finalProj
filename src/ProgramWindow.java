@@ -42,7 +42,8 @@ public class ProgramWindow extends JFrame {
     private ArrayList<Character> keyOrder;
 
 
-    public ProgramWindow(){
+    public ProgramWindow(){ // kps is still lacking, need to only consider a current time frame
+                            // i.e. 1 session, where the kps is tracked, not fucking everything argh.
         startTime = new Date().getTime();
         Key.buildKeyMap();
         keyOrder = new ArrayList<>();
@@ -125,7 +126,10 @@ public class ProgramWindow extends JFrame {
 
     private void updateLabel()
     {
-        infoLabel.setText("<html>KPS:" + (int)manager.getKps() + "<br>" + "BPM:" + manager.getBpm() + "<br>" + "TOTAL KEYS:" + manager.getTotalPresses()+ "</html>");
+        infoLabel.setText("<html>KPS:" + (int)manager.getKps() + "<br>" +
+                "BPM:" + manager.getBpm() + "<br>" +
+                "TOTAL KEYS:" + manager.getTotalPresses()+ "<br>" +
+                manager.getTime() +"</html>");
     }
 
     private void addKey(char c)

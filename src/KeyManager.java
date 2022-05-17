@@ -34,6 +34,10 @@ public class KeyManager {
         return (int)(getKps() * 15);
     }
 
+    public double getTime() {
+        return time;
+    }
+
     public void updateTime(long time)
     {
         this.time = (double)time / 1000;
