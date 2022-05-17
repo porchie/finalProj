@@ -3,8 +3,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +28,8 @@ public class ProgramWindow extends JFrame {
     private boolean closed;
     private JLabel infoLabel;
     private JPanel infoPanel;
+    private JPanel buttonPanel;
+    private JButton keyButton;
     private KeyManager manager;
     private Map<Character, KeyLabel> keyLabelMap;
 
@@ -43,9 +44,11 @@ public class ProgramWindow extends JFrame {
 
 
     public ProgramWindow(){ // kps is still lacking, need to only consider a current time frame
-                            // i.e. 1 session, where the kps is tracked, not fucking everything argh.
+                            // i.e. 1 session, where the kps is tracked
         startTime = new Date().getTime();
-        Key.buildKeyMap();
+        buttonPanel = new JPanel();
+        keyButton = new JButton();
+        Key.buildNativeKeyMap();
         keyOrder = new ArrayList<>();
         try {
            buttonUp = ImageIO.read(new File("assets/button_up.png"));
@@ -64,9 +67,33 @@ public class ProgramWindow extends JFrame {
         j.setLayout(new BorderLayout());
         manager = new KeyManager();
 
+
+        // read from config.cfg file here
+
+        String fileName = "src/config.cfg";
+        File cfgFile = new File(fileName);
+        try {
+            if (cfgFile.createNewFile()){
+
+            }else{
+                // MAKE IT CHECK IF EMPTY
+                Scanner sc = new Scanner(cfgFile);
+                String temp = sc.nextLine();
+                String[] keys = temp.split(";;");
+                for(String k: keys)
+                {
+                    char c = Character.toUpperCase(k.charAt(0));
+                    addKey(c);
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         addKey('S');
         addKey('D');
-        addKey('F');
         addKey('K');
         addKey('L');
 
@@ -98,18 +125,58 @@ public class ProgramWindow extends JFrame {
 
         j.add(p);
         j.add(infoPanel, BorderLayout.SOUTH);
+        j.add(buttonPanel,BorderLayout.NORTH);
+        buttonPanel.add(keyButton);
+        keyButton.setText("Add a Key");
+        keyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame keyFrame = new JFrame("Add a Key");
+                keyFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                JLabel l = new JLabel("Press a key to add it");
+                keyFrame.add(new JPanel().add(l));
+                keyFrame.setSize(300, 200);
+                keyFrame.setLocationRelativeTo(null);
+                NativeKeyListener tempListen = new NativeKeyListener() {
+
+                    @Override
+                    public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
+                        int key = nativeKeyEvent.getKeyCode();
+                        Character c = Key.NativeKeyMap.get(key);
+                        if(addKey(c))
+                        {
+                            keyFrame.dispose();
+                            GlobalScreen.removeNativeKeyListener(this);
+                        }
+                        else
+                        {
+                            l.setText("Already added or bad key");
+                        }
+                    }
+                    @Override
+                    public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {}
+
+                    @Override
+                    public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) {}
+                };
+
+                GlobalScreen.addNativeKeyListener(tempListen);
+
+                keyFrame.setVisible(true);
+            }
+        });
         p.setLocation(20,120);
        // p.setSize(50,50);
 
-        j.addWindowListener(new java.awt.event.WindowAdapter() {
+        j.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent windowEvent) {
                 closed = true;
-                System.out.println("closing");
+                //System.out.println("closing");
             }
         });
 
-
+        j.pack();
         j.setVisible(true);
 
 
@@ -119,8 +186,18 @@ public class ProgramWindow extends JFrame {
             manager.updateTime(curTime - startTime);
             updateLabel();
         }
-        System.out.println("closcd");
+        System.out.println("closcd"); // save to file here
 
+
+        try {
+            FileWriter write = new FileWriter(cfgFile);
+            for(Character k:keyOrder)
+            {
+                write.write(k + ";;");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.exit(0);
     }
 
@@ -132,7 +209,7 @@ public class ProgramWindow extends JFrame {
                 manager.getTime() +"</html>");
     }
 
-    private void addKey(char c)
+    private boolean addKey(char c)
     {
         c = Character.toUpperCase(c);
         Key k = manager.addKey(c);
@@ -142,7 +219,10 @@ public class ProgramWindow extends JFrame {
             keyLabelMap.put(c, kl);
             p.add(kl);
             keyOrder.add(c);
+            j.pack();
+            return true;
         }
+        return false;
     }
     public class KeyTracker implements NativeKeyListener {
 
@@ -152,7 +232,7 @@ public class ProgramWindow extends JFrame {
 
 
                 int key = e.getKeyCode();
-                Character c = Key.keyMap.get(key);
+                Character c = Key.NativeKeyMap.get(key);
 
                 KeyLabel kl = keyLabelMap.get(c);
                 if(kl != null)
@@ -167,7 +247,7 @@ public class ProgramWindow extends JFrame {
         @Override
         public void nativeKeyReleased(NativeKeyEvent e) {
             int key = e.getKeyCode();
-            Character c = Key.keyMap.get(key);
+            Character c = Key.NativeKeyMap.get(key);
 
             KeyLabel kl = keyLabelMap.get(c);
 
