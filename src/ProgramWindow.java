@@ -30,6 +30,7 @@ public class ProgramWindow extends JFrame {
     private JPanel infoPanel;
     private JPanel buttonPanel;
     private JButton keyButton;
+    private JButton removeButton;
     private KeyManager manager;
     private Map<Character, KeyLabel> keyLabelMap;
 
@@ -50,6 +51,12 @@ public class ProgramWindow extends JFrame {
         keyButton = new JButton();
         Key.buildNativeKeyMap();
         keyOrder = new ArrayList<>();
+        keyLabelMap = new HashMap<>();
+        p = new JPanel();
+        infoPanel = new JPanel();
+        removeButton = new JButton();
+
+
         try {
            buttonUp = ImageIO.read(new File("assets/button_up.png"));
            buttonDown = ImageIO.read(new File("assets/button_down.png"));
@@ -57,10 +64,7 @@ public class ProgramWindow extends JFrame {
             e.printStackTrace();
         }
 
-        keyLabelMap = new HashMap<>();
 
-        p = new JPanel();
-        infoPanel = new JPanel();
 
       //  infoPanel.setLayout(new BorderLayout());
         j = new JFrame("javaKPS");
@@ -75,15 +79,19 @@ public class ProgramWindow extends JFrame {
         try {
             if (cfgFile.createNewFile()){
 
-            }else{
+            }
+            else
+            {
                 // MAKE IT CHECK IF EMPTY
-                Scanner sc = new Scanner(cfgFile);
-                String temp = sc.nextLine();
-                String[] keys = temp.split(";;");
-                for(String k: keys)
-                {
-                    char c = Character.toUpperCase(k.charAt(0));
-                    addKey(c);
+                if(cfgFile.length() != 0) {
+                    Scanner sc = new Scanner(cfgFile);
+                    String temp = sc.nextLine();
+                    String[] keys = temp.split(";;");
+                    for (String k : keys) {
+                        char c = Character.toUpperCase(k.charAt(0));
+                        addKey(c);
+                    }
+                    sc.close();
                 }
             }
 
@@ -92,10 +100,10 @@ public class ProgramWindow extends JFrame {
         }
 
 
-        addKey('S');
+     /*   addKey('S');
         addKey('D');
         addKey('K');
-        addKey('L');
+        addKey('L');*/
 
         infoPanel.setPreferredSize(new Dimension(100,100));
         infoLabel = new JLabel("<html>KPS:<br>BPM:<br>TOTAL KEYS:</html>",SwingConstants.CENTER);
@@ -127,6 +135,8 @@ public class ProgramWindow extends JFrame {
         j.add(infoPanel, BorderLayout.SOUTH);
         j.add(buttonPanel,BorderLayout.NORTH);
         buttonPanel.add(keyButton);
+        buttonPanel.add(removeButton);
+
         keyButton.setText("Add a Key");
         keyButton.addActionListener(new ActionListener() {
             @Override
@@ -165,8 +175,49 @@ public class ProgramWindow extends JFrame {
                 keyFrame.setVisible(true);
             }
         });
+
+        removeButton.setText("Remove a Key");
+        removeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame keyFrame = new JFrame("Remove a Key");
+                keyFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                JLabel l = new JLabel("Press a key to remove it");
+                keyFrame.add(new JPanel().add(l));
+                keyFrame.setSize(300, 200);
+                keyFrame.setLocationRelativeTo(null);
+
+
+                NativeKeyListener tempListen = new NativeKeyListener() {
+
+                    @Override
+                    public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
+                        int key = nativeKeyEvent.getKeyCode();
+                        Character c = Key.NativeKeyMap.get(key);
+                        if(removeKey(c))
+                        {
+                            keyFrame.dispose();
+                            GlobalScreen.removeNativeKeyListener(this);
+                        }
+                        else
+                        {
+                            l.setText("Not a key being tracked or bad key");
+                        }
+                    }
+                    @Override
+                    public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {}
+
+                    @Override
+                    public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) {}
+                };
+                GlobalScreen.addNativeKeyListener(tempListen);
+
+                keyFrame.setVisible(true);
+            }
+        });
+
         p.setLocation(20,120);
-       // p.setSize(50,50);
+
 
         j.addWindowListener(new WindowAdapter() {
             @Override
@@ -187,14 +238,13 @@ public class ProgramWindow extends JFrame {
             updateLabel();
         }
         System.out.println("closcd"); // save to file here
-
-
         try {
             FileWriter write = new FileWriter(cfgFile);
             for(Character k:keyOrder)
             {
                 write.write(k + ";;");
             }
+            write.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -206,15 +256,38 @@ public class ProgramWindow extends JFrame {
         infoLabel.setText("<html>KPS:" + (int)manager.getKps() + "<br>" +
                 "BPM:" + manager.getBpm() + "<br>" +
                 "TOTAL KEYS:" + manager.getTotalPresses()+ "<br>" +
-                manager.getTime() +"</html>");
+                "</html>");
+    }
+
+    private boolean removeKey(char c)
+    {
+        c = Character.toUpperCase(c);
+        for(int i = 0; i < keyOrder.size();i++)
+        {
+            if(keyOrder.get(i) == c)
+            {
+                keyOrder.remove(i);
+                KeyLabel kl = keyLabelMap.remove(c);
+                manager.removeKey(c);
+                p.remove(kl);
+                j.invalidate();
+                j.validate();
+                j.repaint();
+
+                j.pack();
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean addKey(char c)
     {
         c = Character.toUpperCase(c);
-        Key k = manager.addKey(c);
+        //System.out.println(c);
+        Key key = manager.addKey(c);
         if(!keyLabelMap.containsKey(c)) {
-            KeyLabel kl = new KeyLabel(new ImageIcon(buttonUp), k);
+            KeyLabel kl = new KeyLabel(new ImageIcon(buttonUp), key);
             kl.setForeground(Color.WHITE);
             keyLabelMap.put(c, kl);
             p.add(kl);

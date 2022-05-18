@@ -18,8 +18,15 @@ public class KeyManager {
         c = Character.toUpperCase(c);
         if (keysTracking.containsKey(c)) return null;
         Key k = new Key(c);
+        //System.out.println(k.getKeyChar());
         keysTracking.put(c, k);
         return k;
+    }
+
+    public Key removeKey(char c)
+    {
+        c = Character.toUpperCase(c);
+        return keysTracking.remove(c);
     }
 
     public int getTotalPresses() {
