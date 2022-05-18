@@ -3,6 +3,7 @@ import java.util.*;
 public class KeyManager {
     private Map<Character, Key> keysTracking;
     private int totalPresses;
+    private int sessionPresses;
     private double time;
     // UR calculator, maybe a class that takes in the bpm to calculate unstable rate
     
@@ -29,12 +30,18 @@ public class KeyManager {
         return keysTracking.remove(c);
     }
 
+
+    public void resetSession()
+    {
+        sessionPresses = 0;
+        time = 0;
+    }
     public int getTotalPresses() {
         return totalPresses;
     }
 
     public double getKps() {
-        return (totalPresses / time);
+        return (sessionPresses / time);
     }
 
     public int getBpm() {
@@ -56,10 +63,11 @@ public class KeyManager {
         if(k == null) return false; // no key of this character is tracked, so false, no key has been pressed, and the timer for session reset continues
         k.pressKey();
         totalPresses++;
+        sessionPresses++;
         return true; // true, a key has been pressed, so reset the timer for session reset
     }
 
-    public String getKeyInfo(char c) // testing method for seeing key info maybe useful for display
+    public String getKeyInfo(char c)
     {
         c = Character.toUpperCase(c);
         Key k = keysTracking.get(c);
@@ -67,19 +75,4 @@ public class KeyManager {
         if( c == ' ') return "space " + k.getTimesPressed();
         return c + " " + k.getTimesPressed();
     }
-    
-    
-  
-    
-    //need a way to track the number of key presses in a certain time period, then after a reset, the value of this period dependent kps is reset
-    //such that kps isnt determined by total runtime of program but a certain kps session. This session should reset after a certain time period where no 
-    //key is pressed.
-    //The time tracking should occur within the window, where if no keypresses are detected for a while, the kps session resets. This session is the way to calculate
-    //kps and max kps 
-    //IF there was no session that resets times and kps, not pressing anything because you stopped for a bit will destroy the kps and also i dont want a timer to be
-    //always ticking.
-    
-    //do this ^
-    
-    //bro what is java timing btw
 }

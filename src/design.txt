@@ -7,8 +7,14 @@ KeyManager Class
 Key Class
 - Represents a key with a character and the times it was pressed
 
-
-
+KeyLabel extends JLabel
+- A subclass of JLabel that has a Key tied to the label
 
 ProgramWindow handles I/O, and key presses and uses key presses to run something
-ProgramWindow has a KeyManager, KeyGraph and probably a map of all keyPress codes to a KeyLabel for display. A KeyLabel is a subclass of JLabel that makes settings the buttons easier;
+ProgramWindow has a KeyManager, KeyGraph and probably a map of all keyPress codes to a KeyLabel for display. A KeyLabel is a subclass of JLabel that makes settings the buttons easier
+
+Main
+-Program is run, reads config for key layout
+-Display key layout, key states, kps, bpm and total presses
+-User has this app in the background while playing a rhythm game
+-This can be used for streaming or just tracking statistics to improve play

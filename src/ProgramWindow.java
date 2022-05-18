@@ -24,6 +24,7 @@ public class ProgramWindow extends JFrame {
     private JFrame j;
     private JPanel p;
 
+    private boolean active;
 
     private boolean closed;
     private JLabel infoLabel;
@@ -33,6 +34,7 @@ public class ProgramWindow extends JFrame {
     private JButton removeButton;
     private KeyManager manager;
     private Map<Character, KeyLabel> keyLabelMap;
+
 
     private long startTime;
     private BufferedImage buttonUp;
@@ -46,7 +48,15 @@ public class ProgramWindow extends JFrame {
 
     public ProgramWindow(){ // kps is still lacking, need to only consider a current time frame
                             // i.e. 1 session, where the kps is tracked
-        startTime = new Date().getTime();
+        /*
+
+        idea!
+        in the main while loop that runs, check if lastPressTime is 6 secs before curTime
+        if that happens, do a reset
+        reset makes start time not, make active false, and reset time in manager, also make manager not update time when not active
+        */
+
+        //startTime = new Date().getTime();
         buttonPanel = new JPanel();
         keyButton = new JButton();
         Key.buildNativeKeyMap();
@@ -234,10 +244,19 @@ public class ProgramWindow extends JFrame {
         while(!closed)
         {
             long curTime = new Date().getTime();
-            manager.updateTime(curTime - startTime);
-            updateLabel();
+           //System.out.println(curTime + " " + lastPressTime);
+            if(active) {
+                manager.updateTime(curTime - startTime);
+                updateLabel();
+                if(curTime - lastPressTime > 6000)
+                {
+                    active = false;
+                    manager.resetSession();
+                }
+            }
         }
-        System.out.println("closcd"); // save to file here
+
+        // save to file here
         try {
             FileWriter write = new FileWriter(cfgFile);
             for(Character k:keyOrder)
@@ -303,7 +322,12 @@ public class ProgramWindow extends JFrame {
         @Override
         public void nativeKeyPressed(NativeKeyEvent e) {
 
-
+            if(!active)
+            {
+                active = true;
+                startTime = new Date().getTime();
+            }
+                lastPressTime = new Date().getTime();
                 int key = e.getKeyCode();
                 Character c = Key.NativeKeyMap.get(key);
 
