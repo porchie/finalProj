@@ -5,11 +5,7 @@ public class KeyManager {
     private int totalPresses;
     private int sessionPresses;
     private double time;
-    // UR calculator, maybe a class that takes in the bpm to calculate unstable rate
-    
-    //according to most osu tools, the bpm is kpm/4, so kps * 15, kinda weird how its not kps*60???? or just bpm=kpm idk im not a musician
-    // 
-
+    private double maxKps;
     public KeyManager() {
         keysTracking = new HashMap<>();
     }
@@ -30,7 +26,10 @@ public class KeyManager {
         return keysTracking.remove(c);
     }
 
-
+    public double getMaxKps()
+    {
+        return maxKps;
+    }
     public void resetSession()
     {
         sessionPresses = 0;
@@ -41,6 +40,8 @@ public class KeyManager {
     }
 
     public double getKps() {
+        double kps = sessionPresses/(time + 0.2); //offset time a bit so kps isnt 10 trillion when first press
+        if(kps > maxKps) maxKps = kps;
         return (sessionPresses / time);
     }
 
@@ -56,6 +57,7 @@ public class KeyManager {
     {
         this.time = (double)time / 1000;
     }
+
     public boolean pressKey(char c)
     {
         c = Character.toUpperCase(c);

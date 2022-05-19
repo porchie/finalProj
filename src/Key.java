@@ -7,7 +7,7 @@ public class Key {
     private int timesPressed;
     private boolean pressed;
 
-    public static void buildNativeKeyMap()
+    public static void buildNativeKeyMap() // map of native keys -> char(class)
     {
         NativeKeyMap.put(NativeKeyEvent.VC_A ,'A');
         NativeKeyMap.put(NativeKeyEvent.VC_B ,'B');

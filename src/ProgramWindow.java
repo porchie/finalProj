@@ -47,17 +47,7 @@ public class ProgramWindow extends JFrame {
     private ArrayList<Character> keyOrder;
 
 
-    public ProgramWindow(){ // kps is still lacking, need to only consider a current time frame
-                            // i.e. 1 session, where the kps is tracked
-        /*
-
-        idea!
-        in the main while loop that runs, check if lastPressTime is 6 secs before curTime
-        if that happens, do a reset
-        reset makes start time not, make active false, and reset time in manager, also make manager not update time when not active
-        */
-
-        //startTime = new Date().getTime();
+    public ProgramWindow(){
         j = new JFrame("javaKPS");
         j.setLayout(new BorderLayout());
         manager = new KeyManager();
@@ -70,7 +60,7 @@ public class ProgramWindow extends JFrame {
         infoPanel = new JPanel();
         removeButton = new JButton();
 
-
+        // button images
         try {
            buttonUp = ImageIO.read(new File("assets/button_up.png"));
            buttonDown = ImageIO.read(new File("assets/button_down.png"));
@@ -120,7 +110,7 @@ public class ProgramWindow extends JFrame {
         Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
         logger.setLevel(Level.OFF);
 
-        try { // global screen
+        try { // global screen for nativeKeyPresses
             GlobalScreen.registerNativeHook();
         } catch (NativeHookException e) {
             e.printStackTrace();
@@ -133,6 +123,7 @@ public class ProgramWindow extends JFrame {
         p.setLocation(20,120);
         buttonPanel.add(keyButton);
         buttonPanel.add(removeButton);
+
         keyButton.setText("Add a Key");
         keyButton.addActionListener(new ActionListener() {
             @Override
@@ -171,7 +162,8 @@ public class ProgramWindow extends JFrame {
 
                 keyFrame.setVisible(true);
             }
-        });
+        }); // opens a new window that prompts for a key
+
         removeButton.setText("Remove a Key");
         removeButton.addActionListener(new ActionListener() {
             @Override
@@ -211,8 +203,8 @@ public class ProgramWindow extends JFrame {
 
                 keyFrame.setVisible(true);
             }
-        });
-        j.addWindowListener(new WindowAdapter() {
+        }); // opens a new window that prompts for a key
+        j.addWindowListener(new WindowAdapter() { // closing window event
             @Override
             public void windowClosing(WindowEvent windowEvent) {
                 closed = true;
@@ -220,7 +212,7 @@ public class ProgramWindow extends JFrame {
         });
         j.pack();
         j.setVisible(true);
-        while(!closed)
+        while(!closed) // main loop that runs when the program is running
         {
             if(active) {
                 long curTime = new Date().getTime();
@@ -251,7 +243,11 @@ public class ProgramWindow extends JFrame {
 
     private void updateLabel()
     {
-        infoLabel.setText("<html>KPS:" + (int)manager.getKps() + "<br>" +
+        if(active)infoLabel.setText("<html>KPS:" + (int)manager.getKps() + "<br>" +
+                "BPM:" + manager.getBpm() + "<br>" +
+                "TOTAL KEYS:" + manager.getTotalPresses()+ "<br>" +
+                "</html>");
+        else infoLabel.setText("<html>MAX KPS:" + (int)manager.getMaxKps() + "<br>" +
                 "BPM:" + manager.getBpm() + "<br>" +
                 "TOTAL KEYS:" + manager.getTotalPresses()+ "<br>" +
                 "</html>");
