@@ -24,9 +24,10 @@ public class ProgramWindow extends JFrame {
     private JFrame j;
     private JPanel p;
 
-    private boolean active;
+    //Because of concurrency stuff, the values read by the while loop are not updated correctly?? Aparently java caches values???? not read from main mem??
+    private volatile boolean active;
+    private volatile boolean closed;
 
-    private boolean closed;
     private JLabel infoLabel;
     private JPanel infoPanel;
     private JPanel buttonPanel;
@@ -57,6 +58,9 @@ public class ProgramWindow extends JFrame {
         */
 
         //startTime = new Date().getTime();
+        j = new JFrame("javaKPS");
+        j.setLayout(new BorderLayout());
+        manager = new KeyManager();
         buttonPanel = new JPanel();
         keyButton = new JButton();
         Key.buildNativeKeyMap();
@@ -73,14 +77,6 @@ public class ProgramWindow extends JFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
-      //  infoPanel.setLayout(new BorderLayout());
-        j = new JFrame("javaKPS");
-        j.setLayout(new BorderLayout());
-        manager = new KeyManager();
-
 
         // read from config.cfg file here
 
@@ -109,16 +105,9 @@ public class ProgramWindow extends JFrame {
             e.printStackTrace();
         }
 
-
-     /*   addKey('S');
-        addKey('D');
-        addKey('K');
-        addKey('L');*/
-
         infoPanel.setPreferredSize(new Dimension(100,100));
         infoLabel = new JLabel("<html>KPS:<br>BPM:<br>TOTAL KEYS:</html>",SwingConstants.CENTER);
         infoPanel.add(infoLabel, BorderLayout.PAGE_END);
-
         infoLabel.setHorizontalTextPosition(JLabel.CENTER);
         infoLabel.setVerticalTextPosition(JLabel.CENTER);
 
@@ -126,8 +115,6 @@ public class ProgramWindow extends JFrame {
         j.setSize(1000, 330);
         j.setLocationRelativeTo(null);
         j.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-
 
         // Get the logger for "org.jnativehook" and set the level to off.
         Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
@@ -140,13 +127,12 @@ public class ProgramWindow extends JFrame {
         }
         GlobalScreen.addNativeKeyListener(new KeyTracker());
 
-
         j.add(p);
         j.add(infoPanel, BorderLayout.SOUTH);
         j.add(buttonPanel,BorderLayout.NORTH);
+        p.setLocation(20,120);
         buttonPanel.add(keyButton);
         buttonPanel.add(removeButton);
-
         keyButton.setText("Add a Key");
         keyButton.addActionListener(new ActionListener() {
             @Override
@@ -163,14 +149,15 @@ public class ProgramWindow extends JFrame {
                     public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
                         int key = nativeKeyEvent.getKeyCode();
                         Character c = Key.NativeKeyMap.get(key);
-                        if(addKey(c))
+                        if(c == null) l.setText("Bad key");
+                        else if(addKey(c))
                         {
                             keyFrame.dispose();
                             GlobalScreen.removeNativeKeyListener(this);
                         }
                         else
                         {
-                            l.setText("Already added or bad key");
+                            l.setText("Already added");
                         }
                     }
                     @Override
@@ -185,7 +172,6 @@ public class ProgramWindow extends JFrame {
                 keyFrame.setVisible(true);
             }
         });
-
         removeButton.setText("Remove a Key");
         removeButton.addActionListener(new ActionListener() {
             @Override
@@ -204,14 +190,15 @@ public class ProgramWindow extends JFrame {
                     public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
                         int key = nativeKeyEvent.getKeyCode();
                         Character c = Key.NativeKeyMap.get(key);
-                        if(removeKey(c))
+                        if(c == null) l.setText("Bad Key");
+                        else if(removeKey(c))
                         {
                             keyFrame.dispose();
                             GlobalScreen.removeNativeKeyListener(this);
                         }
                         else
                         {
-                            l.setText("Not a key being tracked or bad key");
+                            l.setText("Not a key being tracked");
                         }
                     }
                     @Override
@@ -225,37 +212,29 @@ public class ProgramWindow extends JFrame {
                 keyFrame.setVisible(true);
             }
         });
-
-        p.setLocation(20,120);
-
-
         j.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent windowEvent) {
                 closed = true;
-                //System.out.println("closing");
             }
         });
-
         j.pack();
         j.setVisible(true);
-
-
         while(!closed)
         {
-            long curTime = new Date().getTime();
-           //System.out.println(curTime + " " + lastPressTime);
+            //System.out.print(""); //WHY??!?
             if(active) {
+                long curTime = new Date().getTime();
                 manager.updateTime(curTime - startTime);
                 updateLabel();
-                if(curTime - lastPressTime > 6000)
+                if(curTime - lastPressTime > 3500)
                 {
                     active = false;
                     manager.resetSession();
                 }
             }
         }
-
+        System.out.println("closed");
         // save to file here
         try {
             FileWriter write = new FileWriter(cfgFile);
