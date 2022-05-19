@@ -24,7 +24,7 @@ public class ProgramWindow extends JFrame {
     private JFrame j;
     private JPanel p;
 
-    //Because of concurrency stuff, the values read by the while loop are not updated correctly?? Aparently java caches values???? not read from main mem??
+    //Volatile allows read from main mem and change to main mem to deal with concurrency
     private volatile boolean active;
     private volatile boolean closed;
 
@@ -222,7 +222,6 @@ public class ProgramWindow extends JFrame {
         j.setVisible(true);
         while(!closed)
         {
-            //System.out.print(""); //WHY??!?
             if(active) {
                 long curTime = new Date().getTime();
                 manager.updateTime(curTime - startTime);
@@ -231,6 +230,7 @@ public class ProgramWindow extends JFrame {
                 {
                     active = false;
                     manager.resetSession();
+                    updateLabel();
                 }
             }
         }
