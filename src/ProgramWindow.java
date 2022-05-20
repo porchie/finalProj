@@ -134,6 +134,7 @@ public class ProgramWindow extends JFrame {
                 keyFrame.add(new JPanel().add(l));
                 keyFrame.setSize(300, 200);
                 keyFrame.setLocationRelativeTo(null);
+
                 NativeKeyListener tempListen = new NativeKeyListener() {
 
                     @Override
@@ -159,7 +160,12 @@ public class ProgramWindow extends JFrame {
                 };
 
                 GlobalScreen.addNativeKeyListener(tempListen);
-
+                keyFrame.addWindowListener(new WindowAdapter() { // closing window event
+                    @Override
+                    public void windowClosing(WindowEvent windowEvent) {
+                        GlobalScreen.removeNativeKeyListener(tempListen);
+                    }
+                });
                 keyFrame.setVisible(true);
             }
         }); // opens a new window that prompts for a key
@@ -201,6 +207,12 @@ public class ProgramWindow extends JFrame {
                 };
                 GlobalScreen.addNativeKeyListener(tempListen);
 
+                keyFrame.addWindowListener(new WindowAdapter() { // closing window event
+                    @Override
+                    public void windowClosing(WindowEvent windowEvent) {
+                        GlobalScreen.removeNativeKeyListener(tempListen);
+                    }
+                });
                 keyFrame.setVisible(true);
             }
         }); // opens a new window that prompts for a key
