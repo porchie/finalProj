@@ -1,4 +1,4 @@
-ProgramWindow Class
+KpsWindow Class
 - Manages I/O operations of the program, displaying relevant key info and taking in key presses to pass to the manager
 
 KeyManager Class
@@ -10,10 +10,10 @@ Key Class
 KeyLabel extends JLabel
 - A subclass of JLabel that has a Key tied to the label
 
-ProgramWindow handles I/O, and key presses and uses key presses to run something
-ProgramWindow has a KeyManager, KeyGraph and probably a map of all keyPress codes to a KeyLabel for display. A KeyLabel is a subclass of JLabel that makes settings the buttons easier
+KpsWindow handles I/O, and key presses and uses key presses to run something
+KpsWindow has a KeyManager, KeyGraph and probably a map of all keyPress codes to a KeyLabel for display. A KeyLabel is a subclass of JLabel that makes settings the buttons easier
 
-Main
+KpsRunner
 -Program is run, reads config for key layout
 -Display key layout, key states, kps, bpm and total presses
 -User has this app in the background while playing a rhythm game

@@ -14,20 +14,15 @@ import org.jnativehook.keyboard.*;
 
 
 
-public class ProgramWindow extends JFrame {
-    // button for adding a key
-    // button for calculating UR(unstable rate)
-    // graph to display UR
-    // 
-
-
-    private JFrame j;
-    private JPanel p;
+public class KpsWindow extends JFrame {
 
     //Volatile allows read from main mem and change to main mem to deal with concurrency
     private volatile boolean active;
     private volatile boolean closed;
 
+    // Components
+    private JFrame mainWindow;
+    private JPanel keyPanel;
     private JLabel infoLabel;
     private JPanel infoPanel;
     private JPanel buttonPanel;
@@ -38,25 +33,24 @@ public class ProgramWindow extends JFrame {
 
 
     private long startTime;
+    private long lastPressTime;
     private BufferedImage buttonUp;
     private BufferedImage buttonDown;
 
-    private long lastPressTime;
 
-    private KeyGraph kg;
     private ArrayList<Character> keyOrder;
 
 
-    public ProgramWindow(){
-        j = new JFrame("javaKPS");
-        j.setLayout(new BorderLayout());
+    public KpsWindow(){
+        mainWindow = new JFrame("javaKPS");
+        mainWindow.setLayout(new BorderLayout());
         manager = new KeyManager();
         buttonPanel = new JPanel();
         keyButton = new JButton();
         Key.buildNativeKeyMap();
         keyOrder = new ArrayList<>();
         keyLabelMap = new HashMap<>();
-        p = new JPanel();
+        keyPanel = new JPanel();
         infoPanel = new JPanel();
         removeButton = new JButton();
 
@@ -102,9 +96,9 @@ public class ProgramWindow extends JFrame {
         infoLabel.setVerticalTextPosition(JLabel.CENTER);
 
 
-        j.setSize(1000, 330);
-        j.setLocationRelativeTo(null);
-        j.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        mainWindow.setSize(1000, 330);
+        mainWindow.setLocationRelativeTo(null);
+        mainWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Get the logger for "org.jnativehook" and set the level to off.
         Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
@@ -117,10 +111,10 @@ public class ProgramWindow extends JFrame {
         }
         GlobalScreen.addNativeKeyListener(new KeyTracker());
 
-        j.add(p);
-        j.add(infoPanel, BorderLayout.SOUTH);
-        j.add(buttonPanel,BorderLayout.NORTH);
-        p.setLocation(20,120);
+        mainWindow.add(keyPanel);
+        mainWindow.add(infoPanel, BorderLayout.SOUTH);
+        mainWindow.add(buttonPanel,BorderLayout.NORTH);
+        keyPanel.setLocation(20,120);
         buttonPanel.add(keyButton);
         buttonPanel.add(removeButton);
 
@@ -216,14 +210,14 @@ public class ProgramWindow extends JFrame {
                 keyFrame.setVisible(true);
             }
         }); // opens a new window that prompts for a key
-        j.addWindowListener(new WindowAdapter() { // closing window event
+        mainWindow.addWindowListener(new WindowAdapter() { // closing window event
             @Override
             public void windowClosing(WindowEvent windowEvent) {
                 closed = true;
             }
         });
-        j.pack();
-        j.setVisible(true);
+        mainWindow.pack();
+        mainWindow.setVisible(true);
         while(!closed) // main loop that runs when the program is running
         {
             if(active) {
@@ -275,12 +269,12 @@ public class ProgramWindow extends JFrame {
                 keyOrder.remove(i);
                 KeyLabel kl = keyLabelMap.remove(c);
                 manager.removeKey(c);
-                p.remove(kl);
-                j.invalidate();
-                j.validate();
-                j.repaint();
+                keyPanel.remove(kl);
+                mainWindow.invalidate();
+                mainWindow.validate();
+                mainWindow.repaint();
 
-                j.pack();
+                mainWindow.pack();
                 return true;
             }
         }
@@ -296,9 +290,9 @@ public class ProgramWindow extends JFrame {
             KeyLabel kl = new KeyLabel(new ImageIcon(buttonUp), key);
             kl.setForeground(Color.WHITE);
             keyLabelMap.put(c, kl);
-            p.add(kl);
+            keyPanel.add(kl);
             keyOrder.add(c);
-            j.pack();
+            mainWindow.pack();
             return true;
         }
         return false;
