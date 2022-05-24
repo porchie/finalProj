@@ -62,9 +62,9 @@ public class KpsWindow extends JFrame {
             e.printStackTrace();
         }
 
-        // read from config.cfg file here
+        // read from layout.cfg file here
         // gets all the current keys that u want to track from config file, basically save layout
-        String fileName = "src/config.cfg";
+        String fileName = "src/layout.cfg";
         File cfgFile = new File(fileName);
         try {
             if (cfgFile.createNewFile()){
