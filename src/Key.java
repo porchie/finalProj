@@ -5,9 +5,7 @@ public class Key {
     public static final Map<Integer,Character> NativeKeyMap = new HashMap<>();
     private char keyChar;
     private int timesPressed;
-    private boolean pressed;
-
-    public static void buildNativeKeyMap() // map of native keys -> char(class)
+    public static void buildNativeKeyMap() // map of native keys -> Character
     {
         NativeKeyMap.put(NativeKeyEvent.VC_A ,'A');
         NativeKeyMap.put(NativeKeyEvent.VC_B ,'B');
@@ -76,9 +74,4 @@ public class Key {
     {
         timesPressed++;
     }
-
-    public boolean isPressed() {return pressed;}
-
-
-
 }
