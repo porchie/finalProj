@@ -63,7 +63,7 @@ public class KpsWindow extends JFrame {
         }
 
         // read from config.cfg file here
-
+        // gets all the current keys that u want to track from config file, basically save layout
         String fileName = "src/config.cfg";
         File cfgFile = new File(fileName);
         try {
@@ -99,6 +99,12 @@ public class KpsWindow extends JFrame {
         mainWindow.setSize(1000, 330);
         mainWindow.setLocationRelativeTo(null);
         mainWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        mainWindow.add(keyPanel);
+        mainWindow.add(infoPanel, BorderLayout.SOUTH);
+        mainWindow.add(buttonPanel,BorderLayout.NORTH);
+        keyPanel.setLocation(20,120);
+        buttonPanel.add(keyButton);
+        buttonPanel.add(removeButton);
 
         // Get the logger for "org.jnativehook" and set the level to off.
         Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
@@ -111,13 +117,7 @@ public class KpsWindow extends JFrame {
         }
         GlobalScreen.addNativeKeyListener(new KeyTracker());
 
-        mainWindow.add(keyPanel);
-        mainWindow.add(infoPanel, BorderLayout.SOUTH);
-        mainWindow.add(buttonPanel,BorderLayout.NORTH);
-        keyPanel.setLocation(20,120);
-        buttonPanel.add(keyButton);
-        buttonPanel.add(removeButton);
-
+        //key add bt
         keyButton.setText("Add a Key");
         keyButton.addActionListener(new ActionListener() {
             @Override
@@ -164,6 +164,7 @@ public class KpsWindow extends JFrame {
             }
         }); // opens a new window that prompts for a key
 
+        //key rm bt
         removeButton.setText("Remove a Key");
         removeButton.addActionListener(new ActionListener() {
             @Override
@@ -210,6 +211,8 @@ public class KpsWindow extends JFrame {
                 keyFrame.setVisible(true);
             }
         }); // opens a new window that prompts for a key
+
+
         mainWindow.addWindowListener(new WindowAdapter() { // closing window event
             @Override
             public void windowClosing(WindowEvent windowEvent) {
@@ -218,6 +221,7 @@ public class KpsWindow extends JFrame {
         });
         mainWindow.pack();
         mainWindow.setVisible(true);
+
         while(!closed) // main loop that runs when the program is running
         {
             if(active) {
@@ -232,7 +236,7 @@ public class KpsWindow extends JFrame {
                 }
             }
         }
-        System.out.println("closed");
+
         // save to file here
         try {
             FileWriter write = new FileWriter(cfgFile);
