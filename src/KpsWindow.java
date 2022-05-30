@@ -134,7 +134,7 @@ public class KpsWindow extends JFrame {
                     @Override
                     public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
                         int key = nativeKeyEvent.getKeyCode();
-                        Character c = Key.NativeKeyMap.get(key);
+                        Character c = Key.NATIVE_KEY_MAP.get(key);
                         if(c == null) l.setText("Bad key");
                         else if(addKey(c))
                         {
@@ -182,7 +182,7 @@ public class KpsWindow extends JFrame {
                     @Override
                     public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
                         int key = nativeKeyEvent.getKeyCode();
-                        Character c = Key.NativeKeyMap.get(key);
+                        Character c = Key.NATIVE_KEY_MAP.get(key);
                         if(c == null) l.setText("Bad Key");
                         else if(removeKey(c))
                         {
@@ -314,7 +314,7 @@ public class KpsWindow extends JFrame {
             }
                 lastPressTime = new Date().getTime();
                 int key = e.getKeyCode();
-                Character c = Key.NativeKeyMap.get(key);
+                Character c = Key.NATIVE_KEY_MAP.get(key);
 
                 KeyLabel kl = keyLabelMap.get(c);
                 if(kl != null)
@@ -329,7 +329,7 @@ public class KpsWindow extends JFrame {
         @Override
         public void nativeKeyReleased(NativeKeyEvent e) {
             int key = e.getKeyCode();
-            Character c = Key.NativeKeyMap.get(key);
+            Character c = Key.NATIVE_KEY_MAP.get(key);
 
             KeyLabel kl = keyLabelMap.get(c);
 
