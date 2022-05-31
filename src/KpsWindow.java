@@ -36,7 +36,7 @@ public class KpsWindow extends JFrame {
     private long lastPressTime;
     private BufferedImage buttonUp;
     private BufferedImage buttonDown;
-
+    private static final String delimiter = ";;";
 
     private ArrayList<Character> keyOrder;
 
@@ -75,10 +75,9 @@ public class KpsWindow extends JFrame {
                 // MAKE IT CHECK IF EMPTY
                 if(cfgFile.length() != 0) {
                     Scanner sc = new Scanner(cfgFile);
-                    String temp = sc.nextLine();
-                    String[] keys = temp.split(";;");
-                    for (String k : keys) {
-                        char c = Character.toUpperCase(k.charAt(0));
+                    while (sc.hasNextLine()) {
+                        String temp = sc.nextLine();
+                        char c = Character.toUpperCase(temp.charAt(0));
                         addKey(c);
                     }
                     sc.close();
@@ -242,7 +241,7 @@ public class KpsWindow extends JFrame {
             FileWriter write = new FileWriter(cfgFile);
             for(Character k:keyOrder)
             {
-                write.write(k + ";;");
+                write.write(k + System.lineSeparator());
             }
             write.close();
         } catch (IOException e) {
