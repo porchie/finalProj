@@ -77,8 +77,10 @@ public class KpsWindow extends JFrame {
                     Scanner sc = new Scanner(cfgFile);
                     while (sc.hasNextLine()) {
                         String temp = sc.nextLine();
-                        char c = Character.toUpperCase(temp.charAt(0));
-                        addKey(c);
+                        if (temp.length() > 0){
+                            char c = Character.toUpperCase(temp.charAt(0));
+                            addKey(c);
+                         }
                     }
                     sc.close();
                 }
