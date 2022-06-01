@@ -36,7 +36,6 @@ public class KpsWindow extends JFrame {
     private long lastPressTime;
     private BufferedImage buttonUp;
     private BufferedImage buttonDown;
-    private static final String delimiter = ";;";
 
     private ArrayList<Character> keyOrder;
 
@@ -303,8 +302,6 @@ public class KpsWindow extends JFrame {
         return false;
     }
     public class KeyTracker implements NativeKeyListener {
-
-
         @Override
         public void nativeKeyPressed(NativeKeyEvent e) {
 
