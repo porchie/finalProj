@@ -19,6 +19,8 @@ public class KpsWindow extends JFrame {
     //Volatile allows read from main mem and change to main mem to deal with concurrency
     private volatile boolean active;
     private volatile boolean closed;
+    private volatile boolean addWindowOpened;
+    private volatile boolean rmWindowOpened;
 
     // Components
     private JFrame mainWindow;
@@ -122,6 +124,8 @@ public class KpsWindow extends JFrame {
         keyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(addWindowOpened) return;
+                addWindowOpened = true;
                 JFrame keyFrame = new JFrame("Add a Key");
                 keyFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                 JLabel l = new JLabel("Press a key to add it");
@@ -138,6 +142,7 @@ public class KpsWindow extends JFrame {
                         if(c == null) l.setText("Bad key");
                         else if(addKey(c))
                         {
+                            addWindowOpened = false;
                             keyFrame.dispose();
                             GlobalScreen.removeNativeKeyListener(this);
                         }
@@ -157,6 +162,7 @@ public class KpsWindow extends JFrame {
                 keyFrame.addWindowListener(new WindowAdapter() { // closing window event
                     @Override
                     public void windowClosing(WindowEvent windowEvent) {
+                        addWindowOpened = false;
                         GlobalScreen.removeNativeKeyListener(tempListen);
                     }
                 });
@@ -169,6 +175,8 @@ public class KpsWindow extends JFrame {
         removeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(rmWindowOpened) return;
+                rmWindowOpened = true;
                 JFrame keyFrame = new JFrame("Remove a Key");
                 keyFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                 JLabel l = new JLabel("Press a key to remove it");
@@ -186,6 +194,7 @@ public class KpsWindow extends JFrame {
                         if(c == null) l.setText("Bad Key");
                         else if(removeKey(c))
                         {
+                            rmWindowOpened = false;
                             keyFrame.dispose();
                             GlobalScreen.removeNativeKeyListener(this);
                         }
@@ -205,6 +214,7 @@ public class KpsWindow extends JFrame {
                 keyFrame.addWindowListener(new WindowAdapter() { // closing window event
                     @Override
                     public void windowClosing(WindowEvent windowEvent) {
+                        rmWindowOpened = false;
                         GlobalScreen.removeNativeKeyListener(tempListen);
                     }
                 });
