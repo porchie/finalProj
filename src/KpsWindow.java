@@ -39,7 +39,6 @@ public class KpsWindow extends JFrame {
     private BufferedImage buttonUp;
     private BufferedImage buttonDown;
 
-
     private ArrayList<Character> keyOrder;
 
 
@@ -77,11 +76,12 @@ public class KpsWindow extends JFrame {
                 // MAKE IT CHECK IF EMPTY
                 if(cfgFile.length() != 0) {
                     Scanner sc = new Scanner(cfgFile);
-                    String temp = sc.nextLine();
-                    String[] keys = temp.split(";;");
-                    for (String k : keys) {
-                        char c = Character.toUpperCase(k.charAt(0));
-                        addKey(c);
+                    while (sc.hasNextLine()) {
+                        String temp = sc.nextLine();
+                        if (temp.length() > 0){
+                            char c = Character.toUpperCase(temp.charAt(0));
+                            addKey(c);
+                         }
                     }
                     sc.close();
                 }
@@ -252,7 +252,7 @@ public class KpsWindow extends JFrame {
             FileWriter write = new FileWriter(cfgFile);
             for(Character k:keyOrder)
             {
-                write.write(k + ";;");
+                write.write(k + System.lineSeparator());
             }
             write.close();
         } catch (IOException e) {
@@ -312,8 +312,6 @@ public class KpsWindow extends JFrame {
         return false;
     }
     public class KeyTracker implements NativeKeyListener {
-
-
         @Override
         public void nativeKeyPressed(NativeKeyEvent e) {
 
