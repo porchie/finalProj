@@ -45,6 +45,12 @@ public class KpsWindow extends JFrame {
     private ArrayList<Character> keyOrder;
 
 
+    //majic constants
+    public static final int RECT_X_OFFSET = 7;
+    public static final int RECT_Y_OFFSET = 270;
+    public static final int RECT_INIT_H = 10;
+    public static final int RECT_INIT_W = 50;
+
     public KpsWindow(){
         mainWindow = new JFrame("javaKPS");
         mainWindow.setLayout(new BorderLayout());
@@ -72,7 +78,7 @@ public class KpsWindow extends JFrame {
                     for(int i = rects.size()-1;i>=0;i--)
                     {
                         KeyVisRectangle rect = rects.get(i);
-                        rect.setX(kl.getX());
+                        rect.setX(kl.getX()+RECT_X_OFFSET);
                         rect.setY(rect.getY()-5);
                         if(rect != held)
                         {
@@ -400,7 +406,7 @@ public class KpsWindow extends JFrame {
                     lastPressTime = new Date().getTime();
                     if(kl.getCurRect() == null)
                     {
-                        kl.setCurRect(new KeyVisRectangle(kl.getX(),kl.getY()+250,10,50));// so much majics constants lol
+                        kl.setCurRect(new KeyVisRectangle(kl.getX()+RECT_X_OFFSET,kl.getY()+RECT_Y_OFFSET,RECT_INIT_H,RECT_INIT_W));// so much majics constants lol
                     }
                 }
 
