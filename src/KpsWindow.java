@@ -1,5 +1,6 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -21,24 +22,26 @@ public class KpsWindow extends JFrame {
     private volatile boolean closed;
     private volatile boolean addWindowOpened;
     private volatile boolean rmWindowOpened;
+    private volatile boolean keyVisOn;
 
     // Components
     private JFrame mainWindow;
     private JPanel keyPanel;
+    private JPanel keyVisPanel; //future implement
+    private JButton keyVisButton; //future implement
     private JLabel infoLabel;
     private JPanel infoPanel;
     private JPanel buttonPanel;
     private JButton keyButton;
     private JButton removeButton;
-    private KeyManager manager;
     private Map<Character, KeyLabel> keyLabelMap;
 
-
-    private long startTime;
-    private long lastPressTime;
+    private volatile long startTime;
+    private volatile long lastPressTime;
     private BufferedImage buttonUp;
     private BufferedImage buttonDown;
 
+    private KeyManager manager;
     private ArrayList<Character> keyOrder;
 
 
@@ -54,6 +57,47 @@ public class KpsWindow extends JFrame {
         keyPanel = new JPanel();
         infoPanel = new JPanel();
         removeButton = new JButton();
+        keyVisPanel = new JPanel(){
+            @Override
+            protected void paintComponent(Graphics g)
+            {
+                super.paintComponent(g);
+                g.setColor(Color.BLACK);
+                for(Map.Entry<Character,KeyLabel> entry:keyLabelMap.entrySet())
+                {
+                    KeyLabel kl = entry.getValue();
+                    KeyVisRectangle held = kl.getCurRect();
+                    //System.out.println(held);
+                    ArrayList<KeyVisRectangle> rects = kl.getRects();
+                    for(int i = rects.size()-1;i>=0;i--)
+                    {
+                        KeyVisRectangle rect = rects.get(i);
+                        rect.setX(kl.getX());
+                        rect.setY(rect.getY()-5);
+                        if(rect != held)
+                        {
+                            rect.travel(5);
+                        }
+                        else
+                        {
+                            rect.setH(rect.getH()+5);
+                        }
+                        if(rect.getTotalTraveled()<600) {
+                            g.drawRect(rect.getX(), rect.getY(), rect.getW(), rect.getH());
+                            g.fillRect(rect.getX(), rect.getY(), rect.getW(), rect.getH());
+                        }
+                        else
+                        {
+                            //System.out.println("removed");
+                            rects.remove(i);
+
+                        }
+                    }
+
+                }
+            }
+        };
+        keyVisButton = new JButton();
 
         // button images
         try {
@@ -91,6 +135,8 @@ public class KpsWindow extends JFrame {
             e.printStackTrace();
         }
 
+        keyVisPanel.setPreferredSize(new Dimension(buttonPanel.getPreferredSize().width,300));
+
         infoPanel.setPreferredSize(new Dimension(100,100));
         infoLabel = new JLabel("<html>KPS:<br>BPM:<br>TOTAL KEYS:</html>",SwingConstants.CENTER);
         infoPanel.add(infoLabel, BorderLayout.PAGE_END);
@@ -98,13 +144,13 @@ public class KpsWindow extends JFrame {
         infoLabel.setVerticalTextPosition(JLabel.CENTER);
 
 
-        mainWindow.setSize(1000, 330);
+        //mainWindow.setSize(1000, 330);
         mainWindow.setLocationRelativeTo(null);
         mainWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        mainWindow.add(keyVisPanel,BorderLayout.NORTH);
         mainWindow.add(keyPanel);
-        mainWindow.add(infoPanel, BorderLayout.SOUTH);
-        mainWindow.add(buttonPanel,BorderLayout.NORTH);
-        keyPanel.setLocation(20,120);
+        mainWindow.add(infoPanel, BorderLayout.EAST);
+        mainWindow.add(buttonPanel,BorderLayout.SOUTH);
         buttonPanel.add(keyButton);
         buttonPanel.add(removeButton);
 
@@ -232,6 +278,13 @@ public class KpsWindow extends JFrame {
         mainWindow.pack();
         mainWindow.setVisible(true);
 
+        Timer t = new Timer(10, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateAll();
+            }
+        });
+        t.start();
         while(!closed) // main loop that runs when the program is running
         {
             if(active) {
@@ -258,7 +311,15 @@ public class KpsWindow extends JFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        t.stop();
         System.exit(0);
+    }
+
+
+    private void updateAll()
+    {
+        updateLabel();
+        keyVisPanel.repaint();
     }
 
     private void updateLabel()
@@ -284,8 +345,8 @@ public class KpsWindow extends JFrame {
                 KeyLabel kl = keyLabelMap.remove(c);
                 manager.removeKey(c);
                 keyPanel.remove(kl);
-                mainWindow.invalidate();
-                mainWindow.validate();
+               // mainWindow.invalidate();
+                //mainWindow.validate();
                 mainWindow.repaint();
 
                 mainWindow.pack();
@@ -312,6 +373,14 @@ public class KpsWindow extends JFrame {
         return false;
     }
     public class KeyTracker implements NativeKeyListener {
+
+        /*
+        when key is pressed, if the kl's rect is null, create a new rect, set that as the kl's rect. If not null
+        hold the rect in place and extend it
+        when key is released make that kl's rect null
+
+        all rects should update their pos at the same time, with the held ones not doing so, just extending
+         */
         @Override
         public void nativeKeyPressed(NativeKeyEvent e) {
 
@@ -323,14 +392,29 @@ public class KpsWindow extends JFrame {
                 lastPressTime = new Date().getTime();
                 int key = e.getKeyCode();
                 Character c = Key.NATIVE_KEY_MAP.get(key);
-
+                //System.out.println(c);
                 KeyLabel kl = keyLabelMap.get(c);
                 if(kl != null)
                 {
                     kl.setIcon(new ImageIcon(buttonDown));
                     lastPressTime = new Date().getTime();
+                    if(kl.getCurRect() == null)
+                    {
+                        kl.setCurRect(new KeyVisRectangle(kl.getX(),kl.getY()+250,10,50));// so much majics constants lol
+                    }
                 }
 
+
+                //real stupid moment here unsyncornizing the held and unheld lol
+              /*  for(Map.Entry<Character,KeyLabel> entry:keyLabelMap.entrySet())
+                {
+                    KeyLabel keyLab = entry.getValue();
+                    if(keyLab.getCurRect()!= null)
+                    {
+                        keyLab.getCurRect().setY(keyLab.getCurRect().getY()-5);
+                        keyLab.getCurRect().setH(keyLab.getCurRect().getH()+5);//majic
+                    }
+                }*/
         }
 
 
@@ -346,6 +430,7 @@ public class KpsWindow extends JFrame {
                 manager.pressKey(c);
                 kl.setText(manager.getKeyInfo(c));
                 kl.setIcon(new ImageIcon(buttonUp));
+                kl.setCurRect(null);
                 //updateLabel();
             }
         }

@@ -18,3 +18,6 @@ KpsRunner
 -Display key layout, key states, kps, bpm and total presses
 -User has this app in the background while playing a rhythm game
 -This can be used for streaming or just tracking statistics to improve play
+
+
+//kinda outdated but i dont think this document matters
