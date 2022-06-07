@@ -48,7 +48,7 @@ public class KpsWindow extends JFrame {
     //majic constants
     public static final int RECT_X_OFFSET = 7;
     public static final int RECT_Y_OFFSET = 270;
-    public static final int RECT_INIT_H = 10;
+    public static final int RECT_INIT_H = 5;
     public static final int RECT_INIT_W = 50;
 
     public KpsWindow(){
@@ -140,6 +140,10 @@ public class KpsWindow extends JFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //idk why space focuses on bt
+        InputMap im = (InputMap)UIManager.get("Button.focusInputMap");
+        im.put(KeyStroke.getKeyStroke("pressed SPACE"), "none");
+        im.put(KeyStroke.getKeyStroke("released SPACE"), "none");
 
         keyVisPanel.setPreferredSize(new Dimension(buttonPanel.getPreferredSize().width,300));
 
@@ -153,12 +157,13 @@ public class KpsWindow extends JFrame {
         //mainWindow.setSize(1000, 330);
         mainWindow.setLocationRelativeTo(null);
         mainWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        mainWindow.add(keyVisPanel,BorderLayout.NORTH);
+        //mainWindow.add(keyVisPanel,BorderLayout.NORTH);
         mainWindow.add(keyPanel);
         mainWindow.add(infoPanel, BorderLayout.EAST);
         mainWindow.add(buttonPanel,BorderLayout.SOUTH);
         buttonPanel.add(keyButton);
         buttonPanel.add(removeButton);
+        buttonPanel.add(keyVisButton);
 
         // Get the logger for "org.jnativehook" and set the level to off.
         Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
@@ -274,6 +279,25 @@ public class KpsWindow extends JFrame {
             }
         }); // opens a new window that prompts for a key
 
+        //key vis bt
+        keyVisButton.setText("Key Visualization Toggle: " +  ((keyVisOn) ? "ON":"OFF"));
+        keyVisButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(keyVisOn)
+                {
+                    mainWindow.remove(keyVisPanel);
+                }
+                else
+                {
+                    mainWindow.add(keyVisPanel,BorderLayout.NORTH);
+                }
+                keyVisOn = !keyVisOn;
+                keyVisButton.setText("Key Vis Toggle: " +  ((keyVisOn) ? "ON":"OFF"));
+                mainWindow.pack();
+            }
+        });
+
 
         mainWindow.addWindowListener(new WindowAdapter() { // closing window event
             @Override
@@ -287,7 +311,7 @@ public class KpsWindow extends JFrame {
         Timer t = new Timer(10, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateAll();
+                if(keyVisOn)updateAll();
             }
         });
         t.start();
@@ -296,12 +320,12 @@ public class KpsWindow extends JFrame {
             if(active) {
                 long curTime = new Date().getTime();
                 manager.updateTime(curTime - startTime);
-                updateLabel();
+                //updateLabel();
                 if(curTime - lastPressTime > 3500)
                 {
                     active = false;
                     manager.resetSession();
-                    updateLabel();
+                    //updateLabel();
                 }
             }
         }
