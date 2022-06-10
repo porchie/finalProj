@@ -30,6 +30,7 @@ public class KeyManager {
     {
         return maxKps;
     }
+
     public void resetSession()
     {
         sessionPresses = 0;
@@ -47,7 +48,7 @@ public class KeyManager {
 
     public int getBpm() {
         return (int)(getKps() * 15);
-    }
+    } // some music stuff with 4/4 i think thats why kps*15 gets a pretty accurate bpm
 
     public double getTime() {
         return time;

@@ -45,11 +45,13 @@ public class KpsWindow extends JFrame {
     private ArrayList<Character> keyOrder;
 
 
-    //majic constants
+    // constants
     public static final int RECT_X_OFFSET = 7;
     public static final int RECT_Y_OFFSET = 270;
     public static final int RECT_INIT_H = 5;
     public static final int RECT_INIT_W = 50;
+    public static final int TIMEOUT_TIME = 3500;
+    public static final int RECT_RM_TIME = 600;
 
     public KpsWindow(){
         mainWindow = new JFrame("javaKPS");
@@ -88,7 +90,7 @@ public class KpsWindow extends JFrame {
                         {
                             rect.setH(rect.getH()+5);
                         }
-                        if(rect.getTotalTraveled()<600) {
+                        if(rect.getTotalTraveled()<RECT_RM_TIME) { //  majics number why idk 600 is good distance ig, should probs be a constant but whatever
                             g.drawRect(rect.getX(), rect.getY(), rect.getW(), rect.getH());
                             g.fillRect(rect.getX(), rect.getY(), rect.getW(), rect.getH());
                         }
@@ -279,7 +281,7 @@ public class KpsWindow extends JFrame {
             }
         }); // opens a new window that prompts for a key
 
-        //key vis bt
+        //key vis toggle bt
         keyVisButton.setText("Key Visualization Toggle: " +  ((keyVisOn) ? "ON":"OFF"));
         keyVisButton.addActionListener(new ActionListener() {
             @Override
@@ -308,6 +310,7 @@ public class KpsWindow extends JFrame {
         mainWindow.pack();
         mainWindow.setVisible(true);
 
+        // 100 times a second updates key vis rects :) isnt actually that mem hungry wow!!!!!!!
         Timer t = new Timer(10, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -321,7 +324,7 @@ public class KpsWindow extends JFrame {
                 long curTime = new Date().getTime();
                 manager.updateTime(curTime - startTime);
                 //updateLabel();
-                if(curTime - lastPressTime > 3500)
+                if(curTime - lastPressTime > TIMEOUT_TIME)
                 {
                     active = false;
                     manager.resetSession();
@@ -468,7 +471,6 @@ public class KpsWindow extends JFrame {
         @Override
         public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {
             //System.out.println("typed");
-
         }
 
     }
