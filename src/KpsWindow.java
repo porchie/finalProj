@@ -44,6 +44,9 @@ public class KpsWindow extends JFrame {
     private KeyManager manager;
     private ArrayList<Character> keyOrder;
 
+    private static final String fileName = "src/layout.cfg";
+    private static final File cfgFile = new File(fileName);
+
 
     // constants
     public static final int RECT_INIT_H = 5;
@@ -137,8 +140,7 @@ public class KpsWindow extends JFrame {
 
         // read from layout.cfg file here
         // gets all the current keys that u want to track from config file, basically save layout
-        String fileName = "src/layout.cfg";
-        File cfgFile = new File(fileName);
+
         try {
             if (cfgFile.createNewFile()){
 
@@ -335,7 +337,11 @@ public class KpsWindow extends JFrame {
         mainWindow.pack();
         mainWindow.setVisible(true);
 
-        // 100 times a second updates key vis rects :) isnt actually that mem hungry wow!!!!!!!
+
+    }
+
+    public void run()
+    {
         Timer t = new Timer(10, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
