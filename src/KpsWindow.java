@@ -46,12 +46,14 @@ public class KpsWindow extends JFrame {
 
 
     // constants
-    public static final int RECT_X_OFFSET = 7;
-    public static final int RECT_Y_OFFSET = 270;
     public static final int RECT_INIT_H = 5;
     public static final int RECT_INIT_W = 50;
-    public static final int TIMEOUT_TIME = 3500;
-    public static final int RECT_RM_TIME = 600;
+    public static final int RECT_X_OFFSET = (64-RECT_INIT_W)/2;
+    public static final int RECT_Y_OFFSET = 290;
+    public static final int TIMEOUT_TIME = 3000;
+    public static final int RECT_RM_DIST = 325;
+    public static final int RECT_FADE_DIST = 20;
+    public static final int RECT_TRAVEL_DIST = 5;
 
     public KpsWindow(){
         mainWindow = new JFrame("javaKPS");
@@ -70,7 +72,8 @@ public class KpsWindow extends JFrame {
             protected void paintComponent(Graphics g)
             {
                 super.paintComponent(g);
-                g.setColor(Color.BLACK);
+
+                g.setColor(Color.WHITE);
                 for(Map.Entry<Character,KeyLabel> entry:keyLabelMap.entrySet())
                 {
                     KeyLabel kl = entry.getValue();
@@ -80,19 +83,35 @@ public class KpsWindow extends JFrame {
                     for(int i = rects.size()-1;i>=0;i--)
                     {
                         KeyVisRectangle rect = rects.get(i);
+                        if(rect==null) continue; // idk if i need this but ??
                         rect.setX(kl.getX()+RECT_X_OFFSET);
-                        rect.setY(rect.getY()-5);
+                        rect.setY(rect.getY()-RECT_TRAVEL_DIST);
                         if(rect != held)
                         {
-                            rect.travel(5);
+                            rect.travel(RECT_TRAVEL_DIST);
                         }
                         else
                         {
-                            rect.setH(rect.getH()+5);
+                            rect.setH(rect.getH()+RECT_TRAVEL_DIST);
                         }
-                        if(rect.getTotalTraveled()<RECT_RM_TIME) { //  majics number why idk 600 is good distance ig, should probs be a constant but whatever
+                        int travel = rect.getTotalTraveled();
+                        if(travel < RECT_RM_DIST) { //  majics number why idk 600 is good distance ig, should probs be a constant but whatever
+                            boolean fadeReset = false;
+                            if(travel > RECT_FADE_DIST)
+                            {
+                                float a = (float)(travel - RECT_FADE_DIST);
+                                a *= 255/(float)(RECT_RM_DIST-RECT_FADE_DIST);
+                                int alpha = (int)(255-a);
+                                g.setColor(new Color(255,255,255, alpha));
+                                fadeReset = true;
+                                //System.out.println(alpha);
+                            }
                             g.drawRect(rect.getX(), rect.getY(), rect.getW(), rect.getH());
                             g.fillRect(rect.getX(), rect.getY(), rect.getW(), rect.getH());
+                            if(fadeReset)
+                            {
+                                g.setColor(Color.WHITE);
+                            }
                         }
                         else
                         {
@@ -148,21 +167,26 @@ public class KpsWindow extends JFrame {
         im.put(KeyStroke.getKeyStroke("released SPACE"), "none");
 
         keyVisPanel.setPreferredSize(new Dimension(buttonPanel.getPreferredSize().width,300));
+        keyVisPanel.setBackground(Color.BLACK);
 
         infoPanel.setPreferredSize(new Dimension(100,100));
-        infoLabel = new JLabel("<html>KPS:<br>BPM:<br>TOTAL KEYS:</html>",SwingConstants.CENTER);
+        infoLabel = new JLabel("<html><font color='white'>KPS:<br>BPM:<br>TOTAL KEYS:</font></html>",SwingConstants.CENTER);
         infoPanel.add(infoLabel, BorderLayout.PAGE_END);
+        infoPanel.setBackground(Color.BLACK);
         infoLabel.setHorizontalTextPosition(JLabel.CENTER);
         infoLabel.setVerticalTextPosition(JLabel.CENTER);
 
+        keyPanel.setBackground(Color.BLACK);
 
         //mainWindow.setSize(1000, 330);
         mainWindow.setLocationRelativeTo(null);
         mainWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        mainWindow.getContentPane().setBackground(Color.BLACK);
         //mainWindow.add(keyVisPanel,BorderLayout.NORTH);
         mainWindow.add(keyPanel);
         mainWindow.add(infoPanel, BorderLayout.EAST);
         mainWindow.add(buttonPanel,BorderLayout.SOUTH);
+        buttonPanel.setBackground(Color.BLACK);
         buttonPanel.add(keyButton);
         buttonPanel.add(removeButton);
         buttonPanel.add(keyVisButton);
@@ -357,14 +381,14 @@ public class KpsWindow extends JFrame {
 
     private void updateLabel()
     {
-        if(active)infoLabel.setText("<html>KPS:" + (int)manager.getKps() + "<br>" +
+        if(active)infoLabel.setText("<html><font color='white'>KPS:" + (int)manager.getKps() + "<br>" +
                 "BPM:" + manager.getBpm() + "<br>" +
                 "TOTAL KEYS:" + manager.getTotalPresses()+ "<br>" +
-                "</html>");
-        else infoLabel.setText("<html>MAX KPS:" + (int)manager.getMaxKps() + "<br>" +
+                "</font></html>");
+        else infoLabel.setText("<html><font color='white'>MAX KPS:" + (int)manager.getMaxKps() + "<br>" +
                 "BPM:" + manager.getBpm() + "<br>" +
                 "TOTAL KEYS:" + manager.getTotalPresses()+ "<br>" +
-                "</html>");
+                "</font></html>");
     }
 
     private boolean removeKey(char c)
@@ -433,21 +457,9 @@ public class KpsWindow extends JFrame {
                     lastPressTime = new Date().getTime();
                     if(kl.getCurRect() == null)
                     {
-                        kl.setCurRect(new KeyVisRectangle(kl.getX()+RECT_X_OFFSET,kl.getY()+RECT_Y_OFFSET,RECT_INIT_H,RECT_INIT_W));// so much majics constants lol
+                        kl.setCurRect(new KeyVisRectangle(kl.getX()+RECT_X_OFFSET,kl.getY()+RECT_Y_OFFSET,RECT_INIT_H,RECT_INIT_W));// so much constants lol
                     }
                 }
-
-
-                //real stupid moment here unsyncornizing the held and unheld lol
-              /*  for(Map.Entry<Character,KeyLabel> entry:keyLabelMap.entrySet())
-                {
-                    KeyLabel keyLab = entry.getValue();
-                    if(keyLab.getCurRect()!= null)
-                    {
-                        keyLab.getCurRect().setY(keyLab.getCurRect().getY()-5);
-                        keyLab.getCurRect().setH(keyLab.getCurRect().getH()+5);//majic
-                    }
-                }*/
         }
 
 
