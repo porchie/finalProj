@@ -53,7 +53,7 @@ public class KpsWindow extends JFrame {
     public static final int RECT_INIT_W = 50;
     public static final int RECT_X_OFFSET = (64-RECT_INIT_W)/2;
     public static final int RECT_Y_OFFSET = 290;
-    public static final int TIMEOUT_TIME = 3000;
+    public static final int TIMEOUT_TIME = 2500;
     public static final int RECT_RM_DIST = 325;
     public static final int RECT_FADE_DIST = 20;
     public static final int RECT_TRAVEL_DIST = 5;
@@ -345,7 +345,7 @@ public class KpsWindow extends JFrame {
         Timer t = new Timer(10, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(keyVisOn)updateAll();
+                if(keyVisOn)keyVisPanel.repaint();
             }
         });
         t.start();
@@ -354,12 +354,12 @@ public class KpsWindow extends JFrame {
             if(active) {
                 long curTime = new Date().getTime();
                 manager.updateTime(curTime - startTime);
-                //updateLabel();
+                updateLabel();
                 if(curTime - lastPressTime > TIMEOUT_TIME)
                 {
                     active = false;
                     manager.resetSession();
-                    //updateLabel();
+                    updateLabel();
                 }
             }
         }
