@@ -54,6 +54,7 @@ public class KpsWindow extends JFrame {
     public static final int RECT_RM_DIST = 325;
     public static final int RECT_FADE_DIST = 20;
     public static final int RECT_TRAVEL_DIST = 5;
+    public static final Color DEFAULT_COLOR = Color.GRAY;
 
     public KpsWindow(){
         mainWindow = new JFrame("javaKPS");
@@ -167,26 +168,26 @@ public class KpsWindow extends JFrame {
         im.put(KeyStroke.getKeyStroke("released SPACE"), "none");
 
         keyVisPanel.setPreferredSize(new Dimension(buttonPanel.getPreferredSize().width,300));
-        keyVisPanel.setBackground(Color.BLACK);
+        keyVisPanel.setBackground(DEFAULT_COLOR);
 
         infoPanel.setPreferredSize(new Dimension(100,100));
         infoLabel = new JLabel("<html><font color='white'>KPS:<br>BPM:<br>TOTAL KEYS:</font></html>",SwingConstants.CENTER);
         infoPanel.add(infoLabel, BorderLayout.PAGE_END);
-        infoPanel.setBackground(Color.BLACK);
+        infoPanel.setBackground(DEFAULT_COLOR);
         infoLabel.setHorizontalTextPosition(JLabel.CENTER);
         infoLabel.setVerticalTextPosition(JLabel.CENTER);
 
-        keyPanel.setBackground(Color.BLACK);
+        keyPanel.setBackground(DEFAULT_COLOR);
 
         //mainWindow.setSize(1000, 330);
         mainWindow.setLocationRelativeTo(null);
         mainWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        mainWindow.getContentPane().setBackground(Color.BLACK);
+        mainWindow.getContentPane().setBackground(DEFAULT_COLOR);
         //mainWindow.add(keyVisPanel,BorderLayout.NORTH);
         mainWindow.add(keyPanel);
         mainWindow.add(infoPanel, BorderLayout.EAST);
         mainWindow.add(buttonPanel,BorderLayout.SOUTH);
-        buttonPanel.setBackground(Color.BLACK);
+        buttonPanel.setBackground(DEFAULT_COLOR);
         buttonPanel.add(keyButton);
         buttonPanel.add(removeButton);
         buttonPanel.add(keyVisButton);
