@@ -35,6 +35,7 @@ public class KpsWindow extends JFrame {
     private JButton keyButton;
     private JButton removeButton;
     private Map<Character, KeyLabel> keyLabelMap;
+    private Timer t;
 
     private volatile long startTime;
     private volatile long lastPressTime;
@@ -56,7 +57,7 @@ public class KpsWindow extends JFrame {
     public static final int TIMEOUT_TIME = 2500;
     public static final int RECT_RM_DIST = 325;
     public static final int RECT_FADE_DIST = 20;
-    public static final int RECT_TRAVEL_DIST = 5;
+    public static final int RECT_TRAVEL_DIST = 6;
     public static final Color DEFAULT_COLOR = Color.GRAY;
 
     public KpsWindow(){
@@ -129,6 +130,12 @@ public class KpsWindow extends JFrame {
             }
         };
         keyVisButton = new JButton();
+        t = new Timer(10, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(keyVisOn)keyVisPanel.repaint();
+            }
+        });
 
         // button images
         try {
@@ -316,10 +323,12 @@ public class KpsWindow extends JFrame {
                 if(keyVisOn)
                 {
                     mainWindow.remove(keyVisPanel);
+                    t.stop();
                 }
                 else
                 {
                     mainWindow.add(keyVisPanel,BorderLayout.NORTH);
+                    t.start();
                 }
                 keyVisOn = !keyVisOn;
                 keyVisButton.setText("Key Vis Toggle: " +  ((keyVisOn) ? "ON":"OFF"));
@@ -342,13 +351,6 @@ public class KpsWindow extends JFrame {
 
     public void run()
     {
-        Timer t = new Timer(10, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(keyVisOn)keyVisPanel.repaint();
-            }
-        });
-        t.start();
         while(!closed) // main loop that runs when the program is running
         {
             if(active) {
@@ -462,7 +464,7 @@ public class KpsWindow extends JFrame {
                 {
                     kl.setIcon(new ImageIcon(buttonDown));
                     lastPressTime = new Date().getTime();
-                    if(kl.getCurRect() == null)
+                    if(kl.getCurRect() == null && keyVisOn)
                     {
                         kl.setCurRect(new KeyVisRectangle(kl.getX()+RECT_X_OFFSET,kl.getY()+RECT_Y_OFFSET,RECT_INIT_H,RECT_INIT_W));// so much constants lol
                     }
