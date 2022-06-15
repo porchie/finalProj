@@ -1,18 +1,42 @@
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.Timer;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
-import org.jnativehook.keyboard.*;
+import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.keyboard.NativeKeyListener;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.Timer;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+// no wildcard imports :)
 
 
 public class KpsWindow extends JFrame {
@@ -27,15 +51,15 @@ public class KpsWindow extends JFrame {
     // Components
     private JFrame mainWindow;
     private JPanel keyPanel;
-    private JPanel keyVisPanel; //future implement
-    private JButton keyVisButton; //future implement
+    private JPanel keyVisPanel;
+    private JButton keyVisButton;
     private JLabel infoLabel;
     private JPanel infoPanel;
     private JPanel buttonPanel;
     private JButton keyButton;
     private JButton removeButton;
     private Map<Character, KeyLabel> keyLabelMap;
-    private Timer t;
+    private Timer t; //
 
     private volatile long startTime;
     private volatile long lastPressTime;
@@ -83,12 +107,11 @@ public class KpsWindow extends JFrame {
                 {
                     KeyLabel kl = entry.getValue();
                     KeyVisRectangle held = kl.getCurRect();
-                    //System.out.println(held);
                     ArrayList<KeyVisRectangle> rects = kl.getRects();
                     for(int i = rects.size()-1;i>=0;i--)
                     {
                         KeyVisRectangle rect = rects.get(i);
-                        if(rect==null) continue; // idk if i need this but ??
+                        if(rect==null) continue; // idk if i need this but dont want nulls, however my code basically guarantees no nulls are added but just for safety
                         rect.setX(kl.getX()+RECT_X_OFFSET);
                         rect.setY(rect.getY()-RECT_TRAVEL_DIST);
                         if(rect != held)
@@ -100,16 +123,15 @@ public class KpsWindow extends JFrame {
                             rect.setH(rect.getH()+RECT_TRAVEL_DIST);
                         }
                         int travel = rect.getTotalTraveled();
-                        if(travel < RECT_RM_DIST) { //  majics number why idk 600 is good distance ig, should probs be a constant but whatever
+                        if(travel < RECT_RM_DIST) { // optimally remove right as it leaves frame so less mem usage, but whatever
                             boolean fadeReset = false;
                             if(travel > RECT_FADE_DIST)
                             {
                                 float a = (float)(travel - RECT_FADE_DIST);
                                 a *= 255/(float)(RECT_RM_DIST-RECT_FADE_DIST);
-                                int alpha = (int)(255-a);
+                                int alpha = (int)(255-a); // opacity
                                 g.setColor(new Color(255,255,255, alpha));
                                 fadeReset = true;
-                                //System.out.println(alpha);
                             }
                             g.drawRect(rect.getX(), rect.getY(), rect.getW(), rect.getH());
                             g.fillRect(rect.getX(), rect.getY(), rect.getW(), rect.getH());
@@ -120,9 +142,7 @@ public class KpsWindow extends JFrame {
                         }
                         else
                         {
-                            //System.out.println("removed");
-                            rects.remove(i);
-
+                            rects.remove(i); // i hope java's gc actually drops those from mem or thats annoying
                         }
                     }
 
@@ -130,11 +150,8 @@ public class KpsWindow extends JFrame {
             }
         };
         keyVisButton = new JButton();
-        t = new Timer(10, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(keyVisOn)keyVisPanel.repaint();
-            }
+        t = new Timer(10, e -> {
+            if(keyVisOn)keyVisPanel.repaint();
         });
 
         // button images
@@ -149,8 +166,8 @@ public class KpsWindow extends JFrame {
         // gets all the current keys that u want to track from config file, basically save layout
 
         try {
-            if (cfgFile.createNewFile()){
-
+            if (cfgFile.createNewFile()){ // makes a new cfg file if none.
+                // does something in .createNewFile() already
             }
             else
             {
@@ -171,8 +188,8 @@ public class KpsWindow extends JFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //idk why space focuses on bt
-        InputMap im = (InputMap)UIManager.get("Button.focusInputMap");
+        //space focuses and selects a bt to be pressed when space is pressed. instead i just make it do nothing.
+        InputMap im = (InputMap) UIManager.get("Button.focusInputMap");
         im.put(KeyStroke.getKeyStroke("pressed SPACE"), "none");
         im.put(KeyStroke.getKeyStroke("released SPACE"), "none");
 
@@ -180,7 +197,7 @@ public class KpsWindow extends JFrame {
         keyVisPanel.setBackground(DEFAULT_COLOR);
 
         infoPanel.setPreferredSize(new Dimension(100,100));
-        infoLabel = new JLabel("<html><font color='white'>KPS:<br>BPM:<br>TOTAL KEYS:</font></html>",SwingConstants.CENTER);
+        infoLabel = new JLabel("<html><font color='white'>KPS:<br>BPM:<br>TOTAL KEYS:</font></html>", SwingConstants.CENTER);
         infoPanel.add(infoLabel, BorderLayout.PAGE_END);
         infoPanel.setBackground(DEFAULT_COLOR);
         infoLabel.setHorizontalTextPosition(JLabel.CENTER);
@@ -188,11 +205,9 @@ public class KpsWindow extends JFrame {
 
         keyPanel.setBackground(DEFAULT_COLOR);
 
-        //mainWindow.setSize(1000, 330);
         mainWindow.setLocationRelativeTo(null);
         mainWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         mainWindow.getContentPane().setBackground(DEFAULT_COLOR);
-        //mainWindow.add(keyVisPanel,BorderLayout.NORTH);
         mainWindow.add(keyPanel);
         mainWindow.add(infoPanel, BorderLayout.EAST);
         mainWindow.add(buttonPanel,BorderLayout.SOUTH);
@@ -201,7 +216,7 @@ public class KpsWindow extends JFrame {
         buttonPanel.add(removeButton);
         buttonPanel.add(keyVisButton);
 
-        // Get the logger for "org.jnativehook" and set the level to off.
+        // Get the logger for jnativehook and set the level to off.
         Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
         logger.setLevel(Level.OFF);
 
@@ -317,23 +332,20 @@ public class KpsWindow extends JFrame {
 
         //key vis toggle bt
         keyVisButton.setText("Key Visualization Toggle: " +  ((keyVisOn) ? "ON":"OFF"));
-        keyVisButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(keyVisOn)
-                {
-                    mainWindow.remove(keyVisPanel);
-                    t.stop();
-                }
-                else
-                {
-                    mainWindow.add(keyVisPanel,BorderLayout.NORTH);
-                    t.start();
-                }
-                keyVisOn = !keyVisOn;
-                keyVisButton.setText("Key Vis Toggle: " +  ((keyVisOn) ? "ON":"OFF"));
-                mainWindow.pack();
+        keyVisButton.addActionListener(e -> {
+            if(keyVisOn)
+            {
+                mainWindow.remove(keyVisPanel);
+                t.stop();
             }
+            else
+            {
+                mainWindow.add(keyVisPanel,BorderLayout.NORTH);
+                t.start();
+            }
+            keyVisOn = !keyVisOn; // keyVisOn is only modified here so a non-atomic operation seems fine to do
+            keyVisButton.setText("Key Vis Toggle: " +  ((keyVisOn) ? "ON":"OFF"));
+            mainWindow.pack();
         });
 
 
@@ -380,14 +392,6 @@ public class KpsWindow extends JFrame {
         t.stop();
         System.exit(0);
     }
-
-
-    private void updateAll()
-    {
-        updateLabel();
-        keyVisPanel.repaint();
-    }
-
     private void updateLabel()
     {
         if(active)infoLabel.setText("<html><font color='white'>KPS:" + (int)manager.getKps() + "<br>" +
@@ -411,10 +415,7 @@ public class KpsWindow extends JFrame {
                 KeyLabel kl = keyLabelMap.remove(c);
                 manager.removeKey(c);
                 keyPanel.remove(kl);
-               // mainWindow.invalidate();
-                //mainWindow.validate();
                 mainWindow.repaint();
-
                 mainWindow.pack();
                 return true;
             }
@@ -425,7 +426,6 @@ public class KpsWindow extends JFrame {
     private boolean addKey(char c)
     {
         c = Character.toUpperCase(c);
-        //System.out.println(c);
         Key key = manager.addKey(c);
         if(!keyLabelMap.containsKey(c)) {
             KeyLabel kl = new KeyLabel(new ImageIcon(buttonUp), key);
@@ -439,13 +439,10 @@ public class KpsWindow extends JFrame {
         return false;
     }
     public class KeyTracker implements NativeKeyListener {
-
         /*
         when key is pressed, if the kl's rect is null, create a new rect, set that as the kl's rect. If not null
         hold the rect in place and extend it
         when key is released make that kl's rect null
-
-        all rects should update their pos at the same time, with the held ones not doing so, just extending
          */
         @Override
         public void nativeKeyPressed(NativeKeyEvent e) {
@@ -458,7 +455,6 @@ public class KpsWindow extends JFrame {
                 lastPressTime = new Date().getTime();
                 int key = e.getKeyCode();
                 Character c = Key.NATIVE_KEY_MAP.get(key);
-                //System.out.println(c);
                 KeyLabel kl = keyLabelMap.get(c);
                 if(kl != null)
                 {
@@ -485,13 +481,12 @@ public class KpsWindow extends JFrame {
                 kl.setText(manager.getKeyInfo(c));
                 kl.setIcon(new ImageIcon(buttonUp));
                 kl.setCurRect(null);
-                //updateLabel();
             }
         }
 
         @Override
         public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {
-            //System.out.println("typed");
+            //useLess
         }
 
     }

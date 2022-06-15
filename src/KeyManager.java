@@ -1,4 +1,5 @@
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class KeyManager {
     private Map<Character, Key> keysTracking;
@@ -10,12 +11,11 @@ public class KeyManager {
         keysTracking = new HashMap<>();
     }
 
-    public Key addKey(char c) // need to somehow detect this somehow???
+    public Key addKey(char c)
     {
         c = Character.toUpperCase(c);
         if (keysTracking.containsKey(c)) return null;
         Key k = new Key(c);
-        //System.out.println(k.getKeyChar());
         keysTracking.put(c, k);
         return k;
     }
@@ -41,14 +41,14 @@ public class KeyManager {
     }
 
     public double getKps() {
-        double kps = sessionPresses/(time + 0.2); //offset time a bit so kps isnt 10 trillion when first press
+        double kps = sessionPresses/(time + 0.2); //offset time a bit so kps is more stable from the start
         if(kps > maxKps) maxKps = kps;
         return (sessionPresses / time);
     }
 
     public int getBpm() {
         return (int)(getKps() * 15);
-    } // some music stuff with 4/4 i think thats why kps*15 gets a pretty accurate bpm
+    } // the most accurate with most rhythm game charts
 
     public double getTime() {
         return time;

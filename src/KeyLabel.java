@@ -1,10 +1,10 @@
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Icon;
+import javax.swing.JLabel;
 import java.util.ArrayList;
 
 public class KeyLabel extends JLabel {
     private Key key;
-    private KeyVisRectangle curRect; // reference to the rectangle that is the hold note or currently holding
+    private KeyVisRectangle curRect; // reference to the rectangle that is currently held
     private ArrayList<KeyVisRectangle> rects;
 
     public KeyLabel(Icon icon, Key key)

@@ -1,5 +1,7 @@
-import org.jnativehook.keyboard.*;
-import java.util.*;
+import org.jnativehook.keyboard.NativeKeyEvent;
+
+import java.util.HashMap;
+import java.util.Map;
 public class Key {
 
     public static final Map<Integer,Character> NATIVE_KEY_MAP = new HashMap<>();
@@ -7,7 +9,6 @@ public class Key {
     private int timesPressed;
     public static void buildNativeKeyMap() // map of native keys -> Character
     {
-        //idk if there a better way to do dis
         NATIVE_KEY_MAP.put(NativeKeyEvent.VC_A ,'A');
         NATIVE_KEY_MAP.put(NativeKeyEvent.VC_B ,'B');
         NATIVE_KEY_MAP.put(NativeKeyEvent.VC_C ,'C');
@@ -55,7 +56,6 @@ public class Key {
         NATIVE_KEY_MAP.put(NativeKeyEvent.VC_SEMICOLON ,';');
         NATIVE_KEY_MAP.put(NativeKeyEvent.VC_MINUS ,'-');
         NATIVE_KEY_MAP.put(NativeKeyEvent.VC_EQUALS ,'+');
-        
     }
 
 
