@@ -59,7 +59,7 @@ public class KpsWindow extends JFrame {
     private JButton keyButton;
     private JButton removeButton;
     private Map<Character, KeyLabel> keyLabelMap;
-    private Timer t; //
+    private Timer keyVisTimer; //
 
     private volatile long startTime;
     private volatile long lastPressTime;
@@ -75,13 +75,13 @@ public class KpsWindow extends JFrame {
 
     // constants
     public static final int RECT_INIT_H = 5;
-    public static final int RECT_INIT_W = 50;
+    public static final int RECT_INIT_W = 45;
     public static final int RECT_X_OFFSET = (64-RECT_INIT_W)/2;
     public static final int RECT_Y_OFFSET = 290;
     public static final int TIMEOUT_TIME = 2500;
     public static final int RECT_RM_DIST = 325;
     public static final int RECT_FADE_DIST = 20;
-    public static final int RECT_TRAVEL_DIST = 6;
+    public static final int RECT_TRAVEL_DIST = 12;
     public static final Color DEFAULT_COLOR = Color.GRAY;
 
     public KpsWindow(){
@@ -150,8 +150,11 @@ public class KpsWindow extends JFrame {
             }
         };
         keyVisButton = new JButton();
-        t = new Timer(10, e -> {
-            if(keyVisOn)keyVisPanel.repaint();
+        keyVisTimer = new Timer(16, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (keyVisOn) keyVisPanel.repaint();
+            }
         });
 
         // button images
@@ -336,12 +339,12 @@ public class KpsWindow extends JFrame {
             if(keyVisOn)
             {
                 mainWindow.remove(keyVisPanel);
-                t.stop();
+                keyVisTimer.stop();
             }
             else
             {
                 mainWindow.add(keyVisPanel,BorderLayout.NORTH);
-                t.start();
+                keyVisTimer.start();
             }
             keyVisOn = !keyVisOn; // keyVisOn is only modified here so a non-atomic operation seems fine to do
             keyVisButton.setText("Key Vis Toggle: " +  ((keyVisOn) ? "ON":"OFF"));
@@ -389,7 +392,7 @@ public class KpsWindow extends JFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        t.stop();
+        keyVisTimer.stop();
         System.exit(0);
     }
     private void updateLabel()
